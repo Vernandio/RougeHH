@@ -481,6 +481,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4537605355543731077, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8339142034691586410, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_Name
       value: Continue
@@ -977,8 +981,8 @@ RectTransform:
   m_GameObject: {fileID: 631402328}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 288647911}
   - {fileID: 1027906438}
@@ -988,8 +992,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 260.16647, y: 278.23154}
-  m_SizeDelta: {x: 275.1524, y: 225.6985}
+  m_AnchoredPosition: {x: 261, y: 274}
+  m_SizeDelta: {x: 275.1524, y: 189.1859}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &631402330
 MonoBehaviour:
@@ -1970,7 +1974,7 @@ GameObject:
   - component: {fileID: 1420474573}
   - component: {fileID: 1420474572}
   m_Layer: 0
-  m_Name: Text (Legacy)
+  m_Name: Game Title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1993,7 +1997,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -325, y: 142}
+  m_AnchoredPosition: {x: -324.24997, y: 159.75}
   m_SizeDelta: {x: 357.6696, y: 71.3735}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1420474572
