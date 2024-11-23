@@ -6,7 +6,7 @@ public class MovementPlayer : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float rotationSpeed = 720f;
-    private bool isMoving = false;
+    public bool isMoving = false;
     private Animator _animator;
 
     private void Awake()
@@ -28,7 +28,9 @@ public class MovementPlayer : MonoBehaviour
 
     public void MoveTo(Vector3 targetPosition)
     {
-        if (isMoving) return;
+        if(isMoving) {
+            return;
+        }
 
         List<Vector3> path = FindPath(transform.position, targetPosition);
         if (path != null && path.Count > 0)
@@ -36,6 +38,7 @@ public class MovementPlayer : MonoBehaviour
             StartCoroutine(MoveAlongPath(path));
         }
     }
+
 
     private IEnumerator MoveAlongPath(List<Vector3> path)
     {

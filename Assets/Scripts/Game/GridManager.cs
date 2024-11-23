@@ -192,8 +192,8 @@ public class GridManager : MonoBehaviour
             {
                 if (!IsRoomConnected(roomA, roomB.Value))
                 {
-                    Vector3 centerA = new Vector3(Mathf.RoundToInt(roomA.center.x), 0, Mathf.RoundToInt(roomA.center.y));
-                    Vector3 centerB = new Vector3(Mathf.RoundToInt(roomB.Value.center.x), 0, Mathf.RoundToInt(roomB.Value.center.y));
+                    Vector3 centerA = new Vector3(Mathf.RoundToInt(roomA.center.x), 0005f, Mathf.RoundToInt(roomA.center.y));
+                    Vector3 centerB = new Vector3(Mathf.RoundToInt(roomB.Value.center.x), 0005f, Mathf.RoundToInt(roomB.Value.center.y));
 
                     CreateHallway(centerA, centerB);
                     connectedRooms.Add(roomB.Value);
@@ -299,12 +299,21 @@ public class GridManager : MonoBehaviour
             if (hit.collider.CompareTag("Tile"))
             {
                 Vector3 targetPosition = hit.collider.transform.position;
+                if(playerMovement.isMoving){
+                    List<Vector3> path = playerMovement.FindPath(targetPosition, targetPosition);
+                    HighlightPath(path);
+                    return;
+                }
                 if (playerMovement != null && IsValidTile(targetPosition))
                 {
                     List<Vector3> path = playerMovement.FindPath(playerMovement.transform.position, targetPosition);
                     HighlightPath(path);
                 }
+            }else{
+                ClearHighlightedPath(); // Clear highlights if not on a tile
             }
+        }else{
+            ClearHighlightedPath(); // Clear highlights if not on a tile
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -319,6 +328,8 @@ public class GridManager : MonoBehaviour
                         playerMovement.MoveTo(targetPosition);
                         ClearHighlightedPath(); // Clear highlights after clicking
                     }
+                }else{
+                    ClearHighlightedPath(); // Clear highlights if not on a tile
                 }
             }
         }
