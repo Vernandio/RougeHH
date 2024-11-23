@@ -140,7 +140,7 @@ public class GridManager : MonoBehaviour
 
         ShuffleList(roomPositions);
 
-        for (int i = 0; i < 5 && roomPositions.Count > 0; i++)
+        for (int i = 0; i < 10 && roomPositions.Count > 0; i++)
         {
             Vector3 position = roomPositions[0];
             roomPositions.RemoveAt(0);
@@ -149,7 +149,7 @@ public class GridManager : MonoBehaviour
             validTilePositions.Add(position);
         }
 
-        for (int i = 0; i < 3 && roomPositions.Count > 0; i++)
+        for (int i = 0; i < 4 && roomPositions.Count > 0; i++)
         {
             Vector3 position = roomPositions[0];
             roomPositions.RemoveAt(0);
