@@ -11,6 +11,7 @@ public class LevelManager : MonoBehaviour
     public int temp;
     private void Start()
     {
+         playerData.selectedFloor = 999; 
         temp = playerData.floorLevel;
         PopulateDropdown();
     }
@@ -44,7 +45,16 @@ public class LevelManager : MonoBehaviour
 
     public void OnDropdownValueChanged()
     {
-        // Example: Log the selected floor
-        Debug.Log($"Selected: {levelDropdown.options[levelDropdown.value].text}");
+        string selectedOption = levelDropdown.options[levelDropdown.value].text;
+        Debug.Log("Selected option: " + selectedOption);
+
+        if (selectedOption == "Boss")
+        {
+            playerData.selectedFloor = 999;
+        }
+        else
+        {
+            playerData.selectedFloor = int.Parse(selectedOption.Replace("Floor ", ""));
+        }
     }
 }

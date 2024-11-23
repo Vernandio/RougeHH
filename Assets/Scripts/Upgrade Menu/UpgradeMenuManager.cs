@@ -179,6 +179,12 @@ public class UpgradeMenuManager : MonoBehaviour
     {
         if (text == "hesoyam")
         {
+            playerData.playerExp += 500;
+            if(playerData.playerExp >= playerData.playerLevel * 1000){
+                playerData.playerExp -= playerData.playerLevel * 1000;
+                playerData.playerLevel += 1;
+            }
+            saveLoadSystem.SaveGame();
             audioSource.PlayOneShot(cheatCodeSound);
             inputField.text = "";
         }else if(text == "tpagamegampang"){
@@ -195,6 +201,7 @@ public class UpgradeMenuManager : MonoBehaviour
     }
 
     public void startGame(){
+        saveLoadSystem.SaveGame();
         SceneManager.LoadScene("Game");
     }
 

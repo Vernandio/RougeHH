@@ -14,7 +14,6 @@ public class ItemLevel : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Player Level: " + playerData.playerLevel);
         healthPotionLevel.text = "Lvl. " + playerData.healPotion.itemLevel.ToString() + "/50";
         swordLevel.text = "Lvl. " + playerData.sword.itemLevel.ToString() + "/50";
         armorLevel.text = "Lvl. " + playerData.armor.itemLevel.ToString() + "/50";

@@ -16,6 +16,7 @@ public class PlayerDataSO : ScriptableObject
     public int playerLevel;
     public int playerExp;
     public int floorLevel;
+    public int selectedFloor;
     public int currentZhen;
     public Item healPotion;
     public Item sword;
