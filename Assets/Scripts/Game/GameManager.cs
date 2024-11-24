@@ -20,17 +20,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int currentHealth = playerData.healPotion.itemPoint-100;
-        int maxExp = playerData.playerLevel * 1000;
-        playerZhen.text = playerData.currentZhen.ToString();
-        currentFloor.text = "Floor " + playerData.selectedFloor; //Belum ada logicnya
-        enemyCount.text = "Enemy left: 0"; //Belum ada logicnya
-        playerLevel.text = "Level " + playerData.playerLevel.ToString();
-        playerHP.text = currentHealth + "/" + playerData.healPotion.itemPoint.ToString();
-        playerExp.text = playerData.playerExp.ToString() + "/" + maxExp.ToString();
-
-        playerHPBar.value = (float)currentHealth/(float)playerData.healPotion.itemPoint;
-        playerExpBar.value = (float)playerData.playerExp/(float)maxExp;
+        playerStats();
     }
 
     // Update is called once per frame
@@ -49,6 +39,29 @@ public class GameManager : MonoBehaviour
         {
             Time.timeScale = 1;
         }
+        playerStats();
+    }
+
+    public void playerStats(){
+        
+        int currentHealth = playerData.healPotion.itemPoint-100;
+        int maxExp = playerData.playerLevel * 1000;
+        playerZhen.text = playerData.currentZhen.ToString();
+        currentFloor.text = "Floor " + playerData.selectedFloor; //Belum ada logicnya
+        enemyCount.text = "Enemy left: 0"; //Belum ada logicnya
+        playerLevel.text = "Level " + playerData.playerLevel.ToString();
+        playerHP.text = currentHealth + "/" + playerData.healPotion.itemPoint.ToString();
+        playerExp.text = playerData.playerExp.ToString() + "/" + maxExp.ToString();
+
+        playerHPBar.value = (float)currentHealth/(float)playerData.healPotion.itemPoint;
+        playerExpBar.value = (float)playerData.playerExp/(float)maxExp;
+        updateEnemyCount();
+    }
+
+    void updateEnemyCount()
+    {
+        int enemyLeft = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        enemyCount.text = "Enemy left: " + enemyLeft;
     }
 
     public void resume(){

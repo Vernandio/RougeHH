@@ -32,6 +32,17 @@ public class GridManager : MonoBehaviour
     public GameObject barrelPrefab;
     public GameObject pillarPrefab;
     public GameObject fireplacePrefab;
+    public GameObject enemyLowPrefab;
+    public GameObject enemyMidPrefab;
+    public GameObject enemyHighPrefab;
+    public PlayerDataSO playerData;
+
+    [SerializeField]
+    private EnemyDataSO lowEnemyData; // Assign in Inspector
+    [SerializeField]
+    private EnemyDataSO mediumEnemyData; // Assign in Inspector
+    [SerializeField]
+    private EnemyDataSO highEnemyData; // Assign in Inspector
 
     [Header("Materials")]
     public Material normalStoneMaterial; // Public variable for normal stone material
@@ -77,6 +88,7 @@ public class GridManager : MonoBehaviour
         GenerateRooms();
         ConnectRooms();
         SpawnPlayer();
+        SpawnEnemies();
     }
 
     void GenerateRooms()
@@ -253,37 +265,6 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    void SpawnPlayer()
-    {
-        if (validTilePositions.Count == 0)
-        {
-            Debug.LogError("No valid tiles for player spawn.");
-            return;
-        }
-
-        int randomIndex = Random.Range(0, validTilePositions.Count);
-        Vector3 spawnPosition = validTilePositions[randomIndex];
-        spawnPosition.y += 0.4f;
-
-        GameObject player = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
-        playerMovement = player.GetComponent<MovementPlayer>();
-
-        if (playerMovement == null)
-        {
-            Debug.LogError("MovementPlayer component not found on player prefab.");
-        }
-
-        // Assign the player to the camera
-        if (CameraFollow.Instance != null)
-        {
-            CameraFollow.Instance.setPlayer(player.transform); // Ensure this is properly assigned
-        }
-        else
-        {
-            Debug.LogError("CameraFollow instance not found.");
-        }
-    }
-
     void Update()
     {
         HandleInput();
@@ -377,5 +358,260 @@ public class GridManager : MonoBehaviour
 
         highlightedPathRenderers.Clear();  // Clear list of highlighted tiles
         originalTileMaterials.Clear();     // Clear the dictionary of original materials
+    }
+
+    public Vector3 GetRandomBlankTilePosition()
+    {
+        List<Vector3> blankTiles = new List<Vector3>();
+
+        foreach (Vector3 position in validTilePositions)
+        {
+            Collider[] colliders = Physics.OverlapSphere(position, 0.1f);
+            bool isOccupied = false;
+
+            foreach (Collider collider in colliders)
+            {
+                if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Player"))
+                {
+                    isOccupied = true;
+                    break;
+                }
+            }
+
+            if (!isOccupied)
+            {
+                blankTiles.Add(position);
+            }
+        }
+
+        if (blankTiles.Count > 0)
+        {
+            return blankTiles[Random.Range(0, blankTiles.Count)];
+        }
+
+        Debug.LogWarning("No valid blank tiles available for spawning.");
+        return Vector3.zero; // Fallback value
+    }
+
+    void SpawnPlayer()
+    {
+        if (validTilePositions.Count == 0)
+        {
+            Debug.LogError("No valid tiles for player spawn.");
+            return;
+        }
+
+        int randomIndex = Random.Range(0, validTilePositions.Count);
+        Vector3 spawnPosition = validTilePositions[randomIndex];
+        spawnPosition.y += 0.4f;
+
+        GameObject player = Instantiate(playerPrefab, spawnPosition, Quaternion.identity);
+        playerMovement = player.GetComponent<MovementPlayer>();
+
+        if (playerMovement == null)
+        {
+            Debug.LogError("MovementPlayer component not found on player prefab.");
+        }
+
+        // Assign the player to the camera
+        if (CameraFollow.Instance != null)
+        {
+            CameraFollow.Instance.setPlayer(player.transform); // Ensure this is properly assigned
+        }
+        else
+        {
+            Debug.LogError("CameraFollow instance not found.");
+        }
+    }
+
+    void SpawnEnemies()
+    {
+        int totalEnemies = Mathf.RoundToInt((playerData.selectedFloor * 0.2f) + 7);
+
+        // Get room-to-tile mapping
+        Dictionary<Rect, List<Vector3>> roomTileMapping = GridManager.Instance.GetRoomTileMapping();
+
+        // Ensure rooms are valid
+        if (roomTileMapping.Count == 0)
+        {
+            Debug.LogError("No valid rooms found for spawning enemies.");
+            return;
+        }
+
+        List<Rect> rooms = new List<Rect>(roomTileMapping.Keys);
+        List<Vector3> occupiedTiles = new List<Vector3>(); // Tracks enemy positions and their buffer zones
+
+        // Calculate initial even distribution
+        int enemiesPerRoom = totalEnemies / rooms.Count;
+        int remainingEnemies = totalEnemies % rooms.Count;
+
+        // Spawn enemies in each room
+        foreach (Rect room in rooms)
+        {
+            List<Vector3> roomTiles = roomTileMapping[room];
+
+            for (int i = 0; i < enemiesPerRoom; i++)
+            {
+                List<Vector3> validTiles = GridManager.Instance.GetValidTilesWithBuffer(roomTiles, occupiedTiles);
+
+                if (validTiles.Count > 0)
+                {
+                    Vector3 spawnPosition = validTiles[Random.Range(0, validTiles.Count)];
+                    spawnPosition.y += 0.4f;
+                    occupiedTiles.Add(spawnPosition); // Add position to occupied list
+                    roomTiles.Remove(spawnPosition); // Remove from room's valid tiles
+
+                    string enemyType = GetRandomEnemyType(playerData.selectedFloor);
+                    SpawnEnemyAtPosition(spawnPosition, enemyType);
+                }
+            }
+        }
+
+        // Distribute remaining enemies randomly among rooms
+        while (remainingEnemies > 0)
+        {
+            Rect randomRoom = rooms[Random.Range(0, rooms.Count)];
+            List<Vector3> roomTiles = roomTileMapping[randomRoom];
+            List<Vector3> validTiles = GridManager.Instance.GetValidTilesWithBuffer(roomTiles, occupiedTiles);
+
+            if (validTiles.Count > 0)
+            {
+                Vector3 spawnPosition = validTiles[Random.Range(0, validTiles.Count)];
+                spawnPosition.y += 0.4f;
+                occupiedTiles.Add(spawnPosition); // Add position to occupied list
+                roomTiles.Remove(spawnPosition); // Remove from room's valid tiles
+
+                string enemyType = GetRandomEnemyType(playerData.selectedFloor);
+                SpawnEnemyAtPosition(spawnPosition, enemyType);
+                remainingEnemies--;
+            }
+        }
+    }
+
+    string GetRandomEnemyType(int floor)
+    {
+        // Dynamic probabilities: Low, Medium, High
+        float lowChance = Mathf.Clamp01(1.0f - (floor * 0.05f)); // Decreases with floor level
+        float mediumChance = Mathf.Clamp01(0.3f + (floor * 0.03f)); // Increases with floor level
+        float highChance = Mathf.Clamp01(0.1f + (floor * 0.02f)); // Increases with floor level
+
+        // Normalize probabilities to ensure they sum to 1
+        float totalChance = lowChance + mediumChance + highChance;
+        lowChance /= totalChance;
+        mediumChance /= totalChance;
+        highChance /= totalChance;
+
+        // Randomly determine enemy type based on adjusted chances
+        float randomValue = Random.value;
+        if (randomValue < lowChance) return "Low"; // Low-tier enemy
+        else if (randomValue < lowChance + mediumChance) return "Medium"; // Medium-tier enemy
+        else return "High"; // High-tier enemy
+    }
+
+    void SpawnEnemyAtPosition(Vector3 position, string type)
+    {
+        GameObject enemyPrefab;
+        switch(type){
+            case "Low":
+                enemyPrefab = enemyLowPrefab;
+                break;
+            case "Medium":
+                enemyPrefab = enemyMidPrefab;
+                break;
+            case "High":
+                enemyPrefab = enemyHighPrefab;
+                break;
+            default:
+                Debug.LogError("Unknown enemy type!");
+                return;
+        }
+        GameObject enemy = Instantiate(enemyPrefab, position, Quaternion.identity);
+        enemy.tag = "Enemy";
+
+        Enemy enemyComponent = enemy.GetComponent<Enemy>();
+        if (enemyComponent != null)
+        {
+            switch (type)
+            {
+                case "Low":
+                    enemyComponent.enemyData = lowEnemyData;
+                    break;
+                case "Medium":
+                    enemyComponent.enemyData = mediumEnemyData;
+                    break;
+                case "High":
+                    enemyComponent.enemyData = highEnemyData;
+                    break;
+                default:
+                    Debug.LogError("Unknown enemy type!");
+                    break;
+            }
+        }
+        else
+        {
+            Debug.LogError("Enemy script not found on the prefab!");
+        }
+    }
+    public List<Vector3> GetValidTilesWithBuffer(List<Vector3> roomTiles, List<Vector3> occupiedTiles, int buffer = 2)
+    {
+        List<Vector3> validTiles = new List<Vector3>();
+
+        foreach (Vector3 tile in roomTiles)
+        {
+            bool isWithinBuffer = false;
+
+            foreach (Vector3 occupiedTile in occupiedTiles)
+            {
+                if (Vector3.Distance(tile, occupiedTile) < buffer)
+                {
+                    isWithinBuffer = true;
+                    break;
+                }
+            }
+
+            if (!isWithinBuffer)
+            {
+                validTiles.Add(tile);
+            }
+        }
+
+        return validTiles;
+    }
+
+    public Dictionary<Rect, List<Vector3>> GetRoomTileMapping()
+    {
+        Dictionary<Rect, List<Vector3>> roomTileMapping = new Dictionary<Rect, List<Vector3>>();
+
+        foreach (Rect room in rooms)
+        {
+            List<Vector3> roomTiles = new List<Vector3>();
+
+            foreach (Vector3 position in validTilePositions)
+            {
+                if (room.Contains(new Vector2(position.x, position.z)))
+                {
+                    Collider[] colliders = Physics.OverlapSphere(position, 0.1f);
+                    bool isOccupied = false;
+
+                    foreach (Collider collider in colliders)
+                    {
+                        if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Player"))
+                        {
+                            isOccupied = true;
+                            break;
+                        }
+                    }
+
+                    if (!isOccupied)
+                    {
+                        roomTiles.Add(position);
+                    }
+                }
+            }
+
+            roomTileMapping[room] = roomTiles;
+        }
+
+        return roomTileMapping;
     }
 }
