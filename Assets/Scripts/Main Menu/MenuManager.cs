@@ -58,6 +58,7 @@ public class MenuManager : MonoBehaviour
     private void newFile(){
         
             playerData.playerLevel = 1;
+            playerData.selectedFloor = 1;
             playerData.playerExp = 0;
             playerData.floorLevel = 1;
             playerData.currentZhen = 0;

@@ -268,6 +268,7 @@ public class GridManager : MonoBehaviour
     void Update()
     {
         HandleInput();
+        CheckEnemyPlayerProximity();
     }
 
     void HandleInput()
@@ -552,6 +553,30 @@ public class GridManager : MonoBehaviour
             Debug.LogError("Enemy script not found on the prefab!");
         }
     }
+
+    void CheckEnemyPlayerProximity()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player"); // Ensure the player is tagged correctly
+
+        if (player == null) return;
+
+        Vector3 playerPosition = player.transform.position;
+
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in enemies)
+        {
+            Vector3 enemyPosition = enemy.transform.position;
+
+            if (Vector3.Distance(playerPosition, enemyPosition) <= 3f)
+            {
+                // Rotate the enemy to face the player
+                Vector3 directionToPlayer = (playerPosition - enemyPosition).normalized;
+                Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
+                enemy.transform.rotation = Quaternion.Slerp(enemy.transform.rotation, lookRotation, Time.deltaTime * 5f); // Smooth rotation
+            }
+        }
+    }
+
     public List<Vector3> GetValidTilesWithBuffer(List<Vector3> roomTiles, List<Vector3> occupiedTiles, int buffer = 2)
     {
         List<Vector3> validTiles = new List<Vector3>();

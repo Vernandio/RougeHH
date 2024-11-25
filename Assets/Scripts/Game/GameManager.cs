@@ -43,8 +43,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void playerStats(){
-        
-        int currentHealth = playerData.healPotion.itemPoint-100;
+        int currentHealth = playerData.healPotion.itemPoint;
         int maxExp = playerData.playerLevel * 1000;
         playerZhen.text = playerData.currentZhen.ToString();
         currentFloor.text = "Floor " + playerData.selectedFloor; //Belum ada logicnya
