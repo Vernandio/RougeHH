@@ -8,6 +8,7 @@ TagManager:
   - Decoration
   - Enemy
   - Hallway
+  - Enemy_Tile
   layers:
   - Default
   - TransparentFX

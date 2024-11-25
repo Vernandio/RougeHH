@@ -49,26 +49,7 @@ public class GridManager : MonoBehaviour
 
     private GameObject[] decorationPrefabs;
     private Dictionary<Renderer, Material> originalTileMaterials = new Dictionary<Renderer, Material>(); // Store original materials
-
-    public bool IsValidTile(Vector3 position)
-    {
-        foreach (Vector3 validPosition in validTilePositions)
-        {
-            if (Vector3.Distance(validPosition, position) < 0.1f)
-            {
-                Collider[] colliders = Physics.OverlapSphere(validPosition, 0.1f);
-                foreach (Collider collider in colliders)
-                {
-                    if (collider.CompareTag("Decoration"))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
-    }
+    private Animator _animator;
 
     void Awake()
     {
@@ -89,6 +70,32 @@ public class GridManager : MonoBehaviour
         ConnectRooms();
         SpawnPlayer();
         SpawnEnemies();
+    }
+
+    void Update()
+    {
+        HandleInput();
+        CheckEnemyPlayerProximity();
+    }
+
+    public bool IsValidTile(Vector3 position)
+    {
+        foreach (Vector3 validPosition in validTilePositions)
+        {
+            if (Vector3.Distance(validPosition, position) < 0.1f)
+            {
+                Collider[] colliders = Physics.OverlapSphere(validPosition, 0.1f);
+                foreach (Collider collider in colliders)
+                {
+                    if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy_Tile"))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     void GenerateRooms()
@@ -236,7 +243,7 @@ public class GridManager : MonoBehaviour
 
     void CreateHallway(Vector3 start, Vector3 end)
     {
-        Vector3 current = start; 
+        Vector3 current = start;
 
         while (Mathf.RoundToInt(current.x) != Mathf.RoundToInt(end.x))
         {
@@ -265,10 +272,10 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    void Update()
+    bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
     {
-        HandleInput();
-        CheckEnemyPlayerProximity();
+        return (Mathf.Abs(playerPosition.x - enemyPosition.x) == 1 && Mathf.Abs(playerPosition.z - enemyPosition.z) == 0) ||
+               (Mathf.Abs(playerPosition.x - enemyPosition.x) == 0 && Mathf.Abs(playerPosition.z - enemyPosition.z) == 1);
     }
 
     void HandleInput()
@@ -281,7 +288,8 @@ public class GridManager : MonoBehaviour
             if (hit.collider.CompareTag("Tile"))
             {
                 Vector3 targetPosition = hit.collider.transform.position;
-                if(playerMovement.isMoving){
+                if (playerMovement.isMoving)
+                {
                     List<Vector3> path = playerMovement.FindPath(targetPosition, targetPosition);
                     HighlightPath(path);
                     return;
@@ -291,10 +299,14 @@ public class GridManager : MonoBehaviour
                     List<Vector3> path = playerMovement.FindPath(playerMovement.transform.position, targetPosition);
                     HighlightPath(path);
                 }
-            }else{
+            }
+            else
+            {
                 ClearHighlightedPath(); // Clear highlights if not on a tile
             }
-        }else{
+        }
+        else
+        {
             ClearHighlightedPath(); // Clear highlights if not on a tile
         }
 
@@ -310,7 +322,29 @@ public class GridManager : MonoBehaviour
                         playerMovement.MoveTo(targetPosition);
                         ClearHighlightedPath(); // Clear highlights after clicking
                     }
-                }else{
+                }
+                else if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Enemy_Tile"))
+                {
+                    Debug.Log("Enemy Hit");
+                    _animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
+                    GameObject enemy = hit.collider.gameObject;
+                    Vector3 enemyPosition = enemy.transform.position;
+                    Vector3 playerPosition = playerMovement.transform.position;
+
+                    // Check if the enemy is adjacent to the player
+                    if (IsAdjacent(playerPosition, enemyPosition))
+                    {
+                        Debug.Log("Adjacent Hit");
+                        _animator.SetTrigger("Attack");
+                        Vector3 directionToFace = (enemyPosition - playerMovement.transform.position).normalized;
+                        directionToFace.y = 0;
+                        Quaternion lookRotation = Quaternion.LookRotation(directionToFace);
+
+                        playerMovement.transform.rotation = lookRotation; // Adjust speed as needed
+                    }
+                }
+                else
+                {
                     ClearHighlightedPath(); // Clear highlights if not on a tile
                 }
             }
@@ -512,7 +546,8 @@ public class GridManager : MonoBehaviour
     void SpawnEnemyAtPosition(Vector3 position, string type)
     {
         GameObject enemyPrefab;
-        switch(type){
+        switch(type)
+        {
             case "Low":
                 enemyPrefab = enemyLowPrefab;
                 break;
@@ -528,6 +563,15 @@ public class GridManager : MonoBehaviour
         }
         GameObject enemy = Instantiate(enemyPrefab, position, Quaternion.identity);
         enemy.tag = "Enemy";
+
+        Collider[] colliders = Physics.OverlapSphere(position, 0.1f);
+        foreach (Collider collider in colliders)
+        {
+            if (collider.CompareTag("Tile"))
+            {
+                collider.gameObject.tag = "Enemy_Tile"; // Set the tile under the enemy to "Enemy_Tile"
+            }
+        }
 
         Enemy enemyComponent = enemy.GetComponent<Enemy>();
         if (enemyComponent != null)
@@ -620,7 +664,7 @@ public class GridManager : MonoBehaviour
 
                     foreach (Collider collider in colliders)
                     {
-                        if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Player"))
+                        if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Enemy_Tile") || collider.CompareTag("Player"))
                         {
                             isOccupied = true;
                             break;

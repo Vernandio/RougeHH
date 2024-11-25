@@ -50,7 +50,7 @@ public class LevelManager : MonoBehaviour
 
         if (selectedOption == "Boss")
         {
-            // Debug.Log("Boss selected");
+            Debug.Log("Boss selected");
             playerData.selectedFloor = -30;
         }
         else
