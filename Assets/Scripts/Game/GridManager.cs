@@ -204,8 +204,8 @@ public class GridManager : MonoBehaviour
             {
                 if (!IsRoomConnected(roomA, roomB.Value))
                 {
-                    Vector3 centerA = new Vector3(Mathf.RoundToInt(roomA.center.x), 0005f, Mathf.RoundToInt(roomA.center.y));
-                    Vector3 centerB = new Vector3(Mathf.RoundToInt(roomB.Value.center.x), 0005f, Mathf.RoundToInt(roomB.Value.center.y));
+                    Vector3 centerA = new Vector3(Mathf.RoundToInt(roomA.center.x), -0.005f, Mathf.RoundToInt(roomA.center.y));
+                    Vector3 centerB = new Vector3(Mathf.RoundToInt(roomB.Value.center.x), -0.010f, Mathf.RoundToInt(roomB.Value.center.y));
 
                     CreateHallway(centerA, centerB);
                     connectedRooms.Add(roomB.Value);
@@ -236,11 +236,11 @@ public class GridManager : MonoBehaviour
 
     void CreateHallway(Vector3 start, Vector3 end)
     {
-        Vector3 current = start;
+        Vector3 current = start; 
 
         while (Mathf.RoundToInt(current.x) != Mathf.RoundToInt(end.x))
         {
-            Vector3 hallwayPosition = new Vector3(current.x, 0.0005f, current.z);
+            Vector3 hallwayPosition = new Vector3(current.x, -0.0015f, current.z);
             Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
 
             if (!validTilePositions.Contains(hallwayPosition))
@@ -253,7 +253,7 @@ public class GridManager : MonoBehaviour
 
         while (Mathf.RoundToInt(current.z) != Mathf.RoundToInt(end.z))
         {
-            Vector3 hallwayPosition = new Vector3(current.x, 0.0005f, current.z);
+            Vector3 hallwayPosition = new Vector3(current.x, -0.0020f, current.z);
             Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
 
             if (!validTilePositions.Contains(hallwayPosition))
