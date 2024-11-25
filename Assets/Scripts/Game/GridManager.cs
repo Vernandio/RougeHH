@@ -87,7 +87,7 @@ public class GridManager : MonoBehaviour
                 Collider[] colliders = Physics.OverlapSphere(validPosition, 0.1f);
                 foreach (Collider collider in colliders)
                 {
-                    if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy_Tile"))
+                    if (collider.CompareTag("Decoration"))
                     {
                         return false;
                     }
@@ -323,7 +323,7 @@ public class GridManager : MonoBehaviour
                         ClearHighlightedPath(); // Clear highlights after clicking
                     }
                 }
-                else if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Enemy_Tile"))
+                else if (hit.collider.CompareTag("Enemy"))
                 {
                     Debug.Log("Enemy Hit");
                     _animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
@@ -341,6 +341,17 @@ public class GridManager : MonoBehaviour
                         Quaternion lookRotation = Quaternion.LookRotation(directionToFace);
 
                         playerMovement.transform.rotation = lookRotation; // Adjust speed as needed
+                        Debug.Log("Player Data Sword: " + playerData.sword.itemPoint);
+                        Enemy enemyScript = enemy.GetComponent<Enemy>();
+                        if (enemyScript != null)
+                        {
+                            enemyScript.TakeDamage(playerData.sword.itemPoint);
+                            Debug.Log("Enemy HITS: " + playerData.sword.itemPoint);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Enemy script not found!");
+                        }
                     }
                 }
                 else
@@ -564,15 +575,6 @@ public class GridManager : MonoBehaviour
         GameObject enemy = Instantiate(enemyPrefab, position, Quaternion.identity);
         enemy.tag = "Enemy";
 
-        Collider[] colliders = Physics.OverlapSphere(position, 0.1f);
-        foreach (Collider collider in colliders)
-        {
-            if (collider.CompareTag("Tile"))
-            {
-                collider.gameObject.tag = "Enemy_Tile"; // Set the tile under the enemy to "Enemy_Tile"
-            }
-        }
-
         Enemy enemyComponent = enemy.GetComponent<Enemy>();
         if (enemyComponent != null)
         {
@@ -664,7 +666,7 @@ public class GridManager : MonoBehaviour
 
                     foreach (Collider collider in colliders)
                     {
-                        if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Enemy_Tile") || collider.CompareTag("Player"))
+                        if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Player"))
                         {
                             isOccupied = true;
                             break;

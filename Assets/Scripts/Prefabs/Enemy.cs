@@ -7,6 +7,11 @@ public class Enemy : MonoBehaviour
     public EnemyDataSO enemyData; // Reference to the ScriptableObject
     private int currentHP;
     public TextMeshPro nameText;
+    private Animator _animator;
+
+    private void Awake() {
+        _animator = GetComponent<Animator>();
+    }
 
     void Start()
     {
@@ -55,7 +60,8 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
+        _animator.SetTrigger("Death");
         Debug.Log($"{enemyData.enemyName} has been defeated.");
-        Destroy(gameObject);
+        Destroy(gameObject, 2.5f); // Destroy the enemy after 2 seconds
     }
 }
