@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
     private int currentHP;
     public TextMeshPro nameText;
     private Animator _animator;
+    public GameObject hpBar;
 
     private void Awake() {
         _animator = GetComponent<Animator>();
@@ -51,6 +52,7 @@ public class Enemy : MonoBehaviour
     {
         currentHP -= damage;
         Debug.Log($"{enemyData.enemyName} took {damage} damage. Remaining HP: {currentHP}");
+        UpdateHPBar();
 
         if (currentHP <= 0)
         {
@@ -63,5 +65,20 @@ public class Enemy : MonoBehaviour
         _animator.SetTrigger("Death");
         Debug.Log($"{enemyData.enemyName} has been defeated.");
         Destroy(gameObject, 2.5f); // Destroy the enemy after 2 seconds
+    }
+
+    private void UpdateHPBar()
+    {
+        if (hpBar != null)
+        {
+            // Set the HP bar width based on the current HP (scale in X-axis)
+            float healthPercentage = (float)currentHP / (float)enemyData.maxHP;
+            Vector3 newScale = hpBar.transform.localScale;
+            newScale.x = healthPercentage;  // Scale the HP bar along the X-axis
+            hpBar.transform.localScale = newScale;
+
+            float healthXOffset = (1 - healthPercentage) * 0.04f;
+            hpBar.transform.position = new Vector3(healthXOffset, 2.053f, 0);
+        }
     }
 }
