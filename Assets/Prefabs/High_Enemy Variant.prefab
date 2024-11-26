@@ -746,3 +746,4 @@ MonoBehaviour:
   enemyData: {fileID: 11400000, guid: 913e3826cdd77e3408fecbb1cc167545, type: 2}
   nameText: {fileID: 6299607401442380330}
   enemyHPBar: {fileID: 6732884757545180564}
+  playerData: {fileID: 11400000, guid: bded88baff994cb4689beb09897c3013, type: 2}

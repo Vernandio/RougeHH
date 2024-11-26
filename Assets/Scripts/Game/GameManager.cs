@@ -43,6 +43,12 @@ public class GameManager : MonoBehaviour
     }
 
     public void playerStats(){
+
+        if(playerData.playerExp >= playerData.playerLevel * 1000){
+            playerData.playerExp -= playerData.playerLevel * 1000;
+            playerData.playerLevel += 1;
+        }
+
         int currentHealth = playerData.healPotion.itemPoint;
         int maxExp = playerData.playerLevel * 1000;
         playerZhen.text = playerData.currentZhen.ToString();

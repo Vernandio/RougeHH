@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour
     public TextMeshPro nameText;
     private Animator _animator;
     public Slider enemyHPBar;
+    public PlayerDataSO playerData;
 
     private void Awake() {
         _animator = GetComponent<Animator>();
@@ -59,6 +60,13 @@ public class Enemy : MonoBehaviour
 
         if (currentHP <= 0)
         {
+            if(enemyData.maxHP == 10){
+                playerData.playerExp += 1000;
+            }else if(enemyData.maxHP == 50){
+                playerData.playerExp += 500;
+            }else if(enemyData.maxHP == 200){
+                playerData.playerExp += 1000;
+            }
             Die();
         }
     }

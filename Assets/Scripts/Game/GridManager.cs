@@ -19,6 +19,7 @@ public class GridManager : MonoBehaviour
     public int maxRoomSize = 12;
     public int maxAttempts = 100;
     public int bufferSize = 1;
+    private string[] attackAnimations = { "Attack", "Attack2", "Attack3"};
 
     private List<Rect> rooms = new List<Rect>();
     private List<Vector3> validTilePositions = new List<Vector3>();
@@ -278,6 +279,8 @@ public class GridManager : MonoBehaviour
                (Mathf.Abs(playerPosition.x - enemyPosition.x) == 0 && Mathf.Abs(playerPosition.z - enemyPosition.z) == 1);
     }
 
+    private float lastAttackTime = 0f;
+    public float attackCooldown = 2f;
     void HandleInput()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -310,6 +313,7 @@ public class GridManager : MonoBehaviour
             ClearHighlightedPath(); // Clear highlights if not on a tile
         }
 
+
         if (Input.GetMouseButtonDown(0))
         {
             if (Physics.Raycast(ray, out hit))
@@ -325,32 +329,37 @@ public class GridManager : MonoBehaviour
                 }
                 else if (hit.collider.CompareTag("Enemy"))
                 {
-                    Debug.Log("Enemy Hit");
-                    _animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
-                    GameObject enemy = hit.collider.gameObject;
-                    Vector3 enemyPosition = enemy.transform.position;
-                    Vector3 playerPosition = playerMovement.transform.position;
+                    if (Time.time - lastAttackTime >= attackCooldown){
+                        Debug.Log("Enemy Hit");
+                        _animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
+                        GameObject enemy = hit.collider.gameObject;
+                        Vector3 enemyPosition = enemy.transform.position;
+                        Vector3 playerPosition = playerMovement.transform.position;
 
-                    // Check if the enemy is adjacent to the player
-                    if (IsAdjacent(playerPosition, enemyPosition))
-                    {
-                        Debug.Log("Adjacent Hit");
-                        _animator.SetTrigger("Attack");
-                        Vector3 directionToFace = (enemyPosition - playerMovement.transform.position).normalized;
-                        directionToFace.y = 0;
-                        Quaternion lookRotation = Quaternion.LookRotation(directionToFace);
+                        // Check if the enemy is adjacent to the player
+                        if (IsAdjacent(playerPosition, enemyPosition))
+                        {
+                            Debug.Log("Adjacent Hit");
+                            string randomAttack = attackAnimations[Random.Range(0, attackAnimations.Length)];
+                            _animator.SetTrigger(randomAttack);
+                            Vector3 directionToFace = (enemyPosition - playerMovement.transform.position).normalized;
+                            directionToFace.y = 0;
+                            Quaternion lookRotation = Quaternion.LookRotation(directionToFace);
 
-                        playerMovement.transform.rotation = lookRotation; // Adjust speed as needed
-                        Debug.Log("Player Data Sword: " + playerData.sword.itemPoint);
-                        Enemy enemyScript = enemy.GetComponent<Enemy>();
-                        if (enemyScript != null)
-                        {
-                            enemyScript.TakeDamage(playerData.sword.itemPoint);
-                            Debug.Log("Enemy HITS: " + playerData.sword.itemPoint);
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Enemy script not found!");
+                            lastAttackTime = Time.time;
+
+                            playerMovement.transform.rotation = lookRotation; // Adjust speed as needed
+                            Debug.Log("Player Data Sword: " + playerData.sword.itemPoint);
+                            Enemy enemyScript = enemy.GetComponent<Enemy>();
+                            if (enemyScript != null)
+                            {
+                                enemyScript.TakeDamage(playerData.sword.itemPoint);
+                                Debug.Log("Enemy HITS: " + playerData.sword.itemPoint);
+                            }
+                            else
+                            {
+                                Debug.LogWarning("Enemy script not found!");
+                            }
                         }
                     }
                 }

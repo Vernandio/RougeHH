@@ -725,6 +725,7 @@ MonoBehaviour:
   enemyData: {fileID: 11400000, guid: c40b4873ec5a1da4abdad5af95b4a4a1, type: 2}
   nameText: {fileID: 688916861738882104}
   enemyHPBar: {fileID: 4604671952134144840}
+  playerData: {fileID: 11400000, guid: bded88baff994cb4689beb09897c3013, type: 2}
 --- !u!4 &5576098608278921049 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1438546959266459337, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
