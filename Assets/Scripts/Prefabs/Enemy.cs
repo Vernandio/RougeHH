@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class Enemy : MonoBehaviour
     private int currentHP;
     public TextMeshPro nameText;
     private Animator _animator;
-    public GameObject hpBar;
+    public Slider enemyHPBar;
 
     private void Awake() {
         _animator = GetComponent<Animator>();
@@ -16,6 +17,8 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        enemyHPBar.value = 1;
+        enemyHPBar.interactable = false;
         InitializeEnemy();
     }
 
@@ -69,16 +72,6 @@ public class Enemy : MonoBehaviour
 
     private void UpdateHPBar()
     {
-        if (hpBar != null)
-        {
-            // Set the HP bar width based on the current HP (scale in X-axis)
-            float healthPercentage = (float)currentHP / (float)enemyData.maxHP;
-            Vector3 newScale = hpBar.transform.localScale;
-            newScale.x = healthPercentage;  // Scale the HP bar along the X-axis
-            hpBar.transform.localScale = newScale;
-
-            float healthXOffset = (1 - healthPercentage) * 0.04f;
-            hpBar.transform.position = new Vector3(healthXOffset, 2.053f, 0);
-        }
+        enemyHPBar.value = (float)currentHP/(float)enemyData.maxHP;
     }
 }
