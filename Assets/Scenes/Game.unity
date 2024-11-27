@@ -3020,7 +3020,7 @@ PrefabInstance:
     - target: {fileID: 7039394587894070882, guid: f1cb4d7ee118eb7418cf2399f42efe6d, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 9a38d34966735d24e9cda5ecb0a183bc, type: 3}
+      objectReference: {fileID: 21300000, guid: 4293f3f43e7a5524dbcb191b0ef09d9c, type: 3}
     - target: {fileID: 7039394588187140685, guid: f1cb4d7ee118eb7418cf2399f42efe6d, type: 3}
       propertyPath: m_Text
       value: '-'
