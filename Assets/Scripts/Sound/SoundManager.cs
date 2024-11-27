@@ -23,11 +23,13 @@ public class SoundManager : MonoBehaviour
     }
 
     public void combatSound(){
+        audioSource.Stop();
         audioSource.clip = combatMusic;
         audioSource.Play();
     }
 
     public void normalSound(){
+        audioSource.Stop();
         audioSource.clip = normalMusic;
         audioSource.Play();
     }
