@@ -4,13 +4,31 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
+    public static SoundManager Instance { get; private set; }
     public AudioSource audioSource; 
     public AudioClip normalMusic; 
     public AudioClip combatMusic; 
     public AudioClip sword;
     public AudioClip death;
     public AudioClip walk;
+    public AudioClip punch;
+
+    void Awake()
+    {
+        // If there's no instance of SoundManager, set it to this one
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);  // Optional: Keep this object persistent across scenes
+        }
+        else
+        {
+            Destroy(gameObject);  // If an instance already exists, destroy this one
+        }
+    }
+
     // Start is called before the first frame update
+
     void Start()
     {
         
@@ -44,5 +62,9 @@ public class SoundManager : MonoBehaviour
 
     public void walkSound(){
         audioSource.PlayOneShot(walk);
+    }
+
+    public void punchSound(){
+        audioSource.PlayOneShot(punch);
     }
 }

@@ -50,6 +50,7 @@ MonoBehaviour:
   sword: {fileID: 8300000, guid: 15f201e0f0a16b1418250cf4a6f5b96b, type: 3}
   death: {fileID: 8300000, guid: 3930027b1249a4644883211dd8211ea7, type: 3}
   walk: {fileID: 8300000, guid: 3a01892fb3c1d4c45b0fc383e96795ea, type: 3}
+  punch: {fileID: 8300000, guid: ba2cf6f748be0c349b70cacebff41219, type: 3}
 --- !u!1 &4006571875750859009
 GameObject:
   m_ObjectHideFlags: 0

@@ -167,6 +167,14 @@ public class MovementPlayer : MonoBehaviour
         StartCoroutine(ResetMessage());
     }
 
+    public void getDamage(int damage){
+        Debug.Log("MASUK MOVEMENTPLAYER");
+        playerMessage.gameObject.SetActive(true);
+        playerMessage.text = damage.ToString();
+        playerMessage.color = Color.red;
+        StartCoroutine(ResetMessage());
+    }
+
     private IEnumerator ResetMessage()
     {
         // Wait for 0.5 seconds

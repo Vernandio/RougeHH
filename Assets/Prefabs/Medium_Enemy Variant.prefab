@@ -838,6 +838,7 @@ MonoBehaviour:
   sword: {fileID: 8300000, guid: 15f201e0f0a16b1418250cf4a6f5b96b, type: 3}
   death: {fileID: 8300000, guid: 3930027b1249a4644883211dd8211ea7, type: 3}
   walk: {fileID: 8300000, guid: 3a01892fb3c1d4c45b0fc383e96795ea, type: 3}
+  punch: {fileID: 8300000, guid: 81f4ca0392c8fd445b7e4f7cbe618713, type: 3}
 --- !u!1001 &6815343657387323792
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     public static GridManager Instance { get; private set; }
+    public GameManager gameManager;
 
     [Header("Prefabs")]
     public GameObject tilePrefab;
@@ -53,6 +54,7 @@ public class GridManager : MonoBehaviour
     private GameObject[] decorationPrefabs;
     private Dictionary<Renderer, Material> originalTileMaterials = new Dictionary<Renderer, Material>(); // Store original materials
     private Animator _animator;
+
 
     void Awake()
     {
@@ -398,7 +400,11 @@ public class GridManager : MonoBehaviour
                             Enemy enemyScript = enemy.GetComponent<Enemy>();
                             if (enemyScript != null)
                             {
+                                Animator animator = enemy.GetComponent<Animator>();
                                 enemyScript.TakeDamage(playerData.sword.itemPoint);
+                                if(enemyScript.currentHP > 0){
+                                    StartCoroutine(AttackTurn(animator, enemyScript.enemyData.damage));
+                                }
                                 Debug.Log("Enemy HITS: " + playerData.sword.itemPoint);
                             }
                             else
@@ -414,6 +420,28 @@ public class GridManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private int defenseScalingFactor;
+    private IEnumerator AttackTurn(Animator animator, int enemyDamage){
+        yield return new WaitForSeconds(2f);
+        animator.SetTrigger("Punch");
+        int defense = playerData.armor.itemPoint;
+        if(enemyDamage == 2){
+            defenseScalingFactor = Random.Range(100, 201);
+        }else if(enemyDamage >= 10){
+            defenseScalingFactor = Random.Range(50, 101);
+        }else if(enemyDamage >= 50){
+            defenseScalingFactor = Random.Range(20, 51);
+        }
+
+        float defenseFactor = 1 - (defense / (defense + defenseScalingFactor));
+        Debug.Log("Defense Factor: " + defenseFactor);
+        float damageOutput = enemyDamage * defenseFactor;
+
+        Debug.Log("Damage Output: " + damageOutput);
+
+        gameManager.PlayerTakeDamage((int)damageOutput);  // Call PlayerTakeDamage() to apply the damage to the player
     }
 
     void HighlightPath(List<Vector3> path)

@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
     public Text playerZhen;
     public Text currentFloor;
     public Text enemyCount;
@@ -21,6 +22,14 @@ public class GameManager : MonoBehaviour
     public Text gameOverText;
     int currentHealth;
     int maxExp;
+
+    public void PlayerTakeDamage(int damage){
+        Debug.Log("MASUK SINI WOYYY" + damage);
+        currentHealth -= damage;
+        MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
+        playerMovement.getDamage(damage);
+        playerStats();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -56,6 +65,8 @@ public class GameManager : MonoBehaviour
             gameOverText.text = "Floor Cleared";
             gameOverMenu.SetActive(true);
         }else if(currentHealth <= 0){
+            Animator animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
+            // animator.SetTrigger("Death");
             gameOverText.text = "Game Over";
             gameOverMenu.SetActive(true);
         }
@@ -73,7 +84,6 @@ public class GameManager : MonoBehaviour
             playerMovement.levelUp();
         }
 
-        currentHealth = playerData.healPotion.itemPoint;
         maxExp = playerData.playerLevel * 1000;
         playerZhen.text = playerData.currentZhen.ToString();
         if(playerData.selectedFloor == -30){
