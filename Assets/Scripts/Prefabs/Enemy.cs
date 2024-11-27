@@ -87,18 +87,23 @@ public class Enemy : MonoBehaviour
 
         if (currentHP <= 0)
         {
-            if(enemyData.maxHP == 10){
-                playerData.playerExp += 1000;
-                playerData.currentZhen += 2;
-            }else if(enemyData.maxHP == 50){
-                playerData.playerExp += 500;
-                playerData.currentZhen += 15;
-            }else if(enemyData.maxHP == 200){
-                playerData.playerExp += 1000;
-                playerData.currentZhen += 50;
-            }
-            Die();
+            StartCoroutine(SwordAnimation2());
         }
+    }
+
+    private IEnumerator SwordAnimation2(){
+        yield return new WaitForSeconds(1.5f);
+        if(enemyData.maxHP == 10){
+            playerData.playerExp += 1000;
+            playerData.currentZhen += 2;
+        }else if(enemyData.maxHP == 50){
+            playerData.playerExp += 500;
+            playerData.currentZhen += 15;
+        }else if(enemyData.maxHP == 200){
+            playerData.playerExp += 1000;
+            playerData.currentZhen += 50;
+        }
+        Die();
     }
 
     private IEnumerator SwordAnimation(){
