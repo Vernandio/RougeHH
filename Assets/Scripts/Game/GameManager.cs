@@ -45,7 +45,14 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape)){
             bool isActive = escapeMenu.activeSelf;
             escapeMenu.SetActive(!isActive); // Toggle active state
+        }else if(Input.GetKeyDown(KeyCode.Alpha1)){
+            Debug.Log("1 Clicked");
+        }else if(Input.GetKeyDown(KeyCode.Alpha2)){
+            Debug.Log("2 Clicked");
+        }else if(Input.GetKeyDown(KeyCode.Alpha3)){
+            Debug.Log("3 Clicked");
         }
+
 
         if (escapeMenu.activeSelf)
         {
