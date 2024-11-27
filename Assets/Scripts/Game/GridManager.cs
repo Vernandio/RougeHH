@@ -55,7 +55,6 @@ public class GridManager : MonoBehaviour
     private Dictionary<Renderer, Material> originalTileMaterials = new Dictionary<Renderer, Material>(); // Store original materials
     private Animator _animator;
 
-
     void Awake()
     {
         if (Instance == null)
@@ -486,39 +485,6 @@ public class GridManager : MonoBehaviour
 
         highlightedPathRenderers.Clear();  // Clear list of highlighted tiles
         originalTileMaterials.Clear();     // Clear the dictionary of original materials
-    }
-
-    public Vector3 GetRandomBlankTilePosition()
-    {
-        List<Vector3> blankTiles = new List<Vector3>();
-
-        foreach (Vector3 position in validTilePositions)
-        {
-            Collider[] colliders = Physics.OverlapSphere(position, 0.1f);
-            bool isOccupied = false;
-
-            foreach (Collider collider in colliders)
-            {
-                if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Player") || collider.CompareTag("Enemy_Tile"))
-                {
-                    isOccupied = true;
-                    break;
-                }
-            }
-
-            if (!isOccupied)
-            {
-                blankTiles.Add(position);
-            }
-        }
-
-        if (blankTiles.Count > 0)
-        {
-            return blankTiles[Random.Range(0, blankTiles.Count)];
-        }
-
-        Debug.LogWarning("No valid blank tiles available for spawning.");
-        return Vector3.zero; // Fallback value
     }
 
     void SpawnPlayer()
