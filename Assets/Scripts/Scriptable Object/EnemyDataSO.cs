@@ -6,4 +6,5 @@ public class EnemyDataSO : ScriptableObject
     public string enemyName;
     public int maxHP;
     public int damage;
+    public int defense;
 }

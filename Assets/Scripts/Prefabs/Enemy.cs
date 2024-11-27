@@ -59,6 +59,20 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        int defense = enemyData.defense;
+        if(damage <= 10){
+            defenseScalingFactor = Random.Range(100, 201);
+        }else if(damage < 50){
+            defenseScalingFactor = Random.Range(50, 101);
+        }else if(damage >= 50){
+            defenseScalingFactor = Random.Range(20, 51);
+        }
+
+        float defenseFactor = 1 - (defense / (defense + defenseScalingFactor));
+        float damageOutput = damage * defenseFactor;
+        
+        damage = (int)damageOutput;
+
         float critChance = playerData.defense.itemPoint * 0.01f;
         float critDamage = playerData.sword.itemPoint * (1 + playerData.magic.itemPoint * 0.01f);
         float realDamage = damage;

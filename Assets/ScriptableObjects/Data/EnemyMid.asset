@@ -15,3 +15,4 @@ MonoBehaviour:
   enemyName: Medium
   maxHP: 50
   damage: 10
+  defense: 20

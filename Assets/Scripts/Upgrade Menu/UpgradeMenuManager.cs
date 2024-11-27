@@ -73,7 +73,7 @@ public class UpgradeMenuManager : MonoBehaviour
     public void buyItem(){
         switch(itemName.text){
             case "Health Up":
-                if(playerData.currentZhen >= playerData.healPotion.itemPrice){
+                if(playerData.currentZhen >= playerData.healPotion.itemPrice && playerData.healPotion.itemLevel < 50){
                     playerData.currentZhen -= playerData.healPotion.itemPrice;
                     playerData.healPotion.itemPrice += 50;
                     playerData.sword.itemPrice += 10;
@@ -88,12 +88,17 @@ public class UpgradeMenuManager : MonoBehaviour
                     saveLoadSystem.SaveGame();
                     errorText.gameObject.SetActive(false);
                 }else{
+                    if(playerData.currentZhen < playerData.healPotion.itemPrice){
+                        errorText.text = "You don't have enough Zhen.";
+                    }else{
+                        errorText.text = "Max level reached.";
+                    }
                     errorText.gameObject.SetActive(true);
                     audioSource.PlayOneShot(errorSFX);
                 }
                 break;
             case "Attack Up":
-                if(playerData.currentZhen >= playerData.sword.itemPrice){
+                if(playerData.currentZhen >= playerData.sword.itemPrice && playerData.sword.itemLevel < 50){
                     playerData.currentZhen -= playerData.sword.itemPrice;
                     playerData.sword.itemPrice += 50;
                     playerData.healPotion.itemPrice += 10;
@@ -108,12 +113,17 @@ public class UpgradeMenuManager : MonoBehaviour
                     saveLoadSystem.SaveGame();
                     errorText.gameObject.SetActive(false);
                 }else{
+                    if(playerData.currentZhen < playerData.sword.itemPrice){
+                        errorText.text = "You don't have enough Zhen.";
+                    }else{
+                        errorText.text = "Max level reached.";
+                    }
                     errorText.gameObject.SetActive(true);
                     audioSource.PlayOneShot(errorSFX);
                 }
                     break;
             case "Defense Up":
-                if(playerData.currentZhen >= playerData.armor.itemPrice){
+                if(playerData.currentZhen >= playerData.armor.itemPrice && playerData.armor.itemLevel < 50){
                     playerData.currentZhen -= playerData.armor.itemPrice;
                     playerData.armor.itemPrice += 50;
                     playerData.healPotion.itemPrice += 10;
@@ -128,12 +138,17 @@ public class UpgradeMenuManager : MonoBehaviour
                     saveLoadSystem.SaveGame();
                     errorText.gameObject.SetActive(false);
                 }else{
+                    if(playerData.currentZhen < playerData.armor.itemPrice){
+                        errorText.text = "You don't have enough Zhen.";
+                    }else{
+                        errorText.text = "Max level reached.";
+                    }
                     errorText.gameObject.SetActive(true);
                     audioSource.PlayOneShot(errorSFX);
                 }
                     break;
             case "Luck Up":
-                if(playerData.currentZhen >= playerData.defense.itemPrice){
+                if(playerData.currentZhen >= playerData.defense.itemPrice && playerData.defense.itemLevel < 50){
                         playerData.currentZhen -= playerData.defense.itemPrice;
                         playerData.defense.itemPrice += 50;
                         playerData.healPotion.itemPrice += 10;
@@ -148,12 +163,17 @@ public class UpgradeMenuManager : MonoBehaviour
                         saveLoadSystem.SaveGame();
                         errorText.gameObject.SetActive(false);
                 }else{
+                    if(playerData.currentZhen < playerData.defense.itemPrice){
+                        errorText.text = "You don't have enough Zhen.";
+                    }else{
+                        errorText.text = "Max level reached.";
+                    }
                     errorText.gameObject.SetActive(true);
                     audioSource.PlayOneShot(errorSFX);
                 }
                 break;
             case "Crit Dmg Up":
-                if(playerData.currentZhen >= playerData.magic.itemPrice){
+                if(playerData.currentZhen >= playerData.magic.itemPrice && playerData.magic.itemLevel < 50){
                         playerData.currentZhen -= playerData.magic.itemPrice;
                         playerData.magic.itemPrice += 50;
                         playerData.healPotion.itemPrice += 10;
@@ -168,6 +188,11 @@ public class UpgradeMenuManager : MonoBehaviour
                         saveLoadSystem.SaveGame();
                         errorText.gameObject.SetActive(false);
                 }else{
+                    if(playerData.currentZhen < playerData.magic.itemPrice){
+                        errorText.text = "You don't have enough Zhen.";
+                    }else{
+                        errorText.text = "Max level reached.";
+                    }
                     errorText.gameObject.SetActive(true);
                     audioSource.PlayOneShot(errorSFX);
                 }
