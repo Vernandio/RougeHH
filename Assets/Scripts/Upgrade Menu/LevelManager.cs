@@ -11,7 +11,7 @@ public class LevelManager : MonoBehaviour
     public int temp;
     private void Start()
     {
-         playerData.selectedFloor = 999; 
+        playerData.selectedFloor = -30; 
         temp = playerData.floorLevel;
         PopulateDropdown();
     }

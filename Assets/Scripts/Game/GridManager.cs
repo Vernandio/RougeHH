@@ -44,6 +44,8 @@ public class GridManager : MonoBehaviour
     private EnemyDataSO mediumEnemyData; // Assign in Inspector
     [SerializeField]
     private EnemyDataSO highEnemyData; // Assign in Inspector
+    [SerializeField]
+    private EnemyDataSO bossEnemyData; // Assign in Inspector
 
     [Header("Materials")]
     public Material normalStoneMaterial; // Public variable for normal stone material
@@ -67,6 +69,17 @@ public class GridManager : MonoBehaviour
     void Start()
     {
         decorationPrefabs = new GameObject[] { tablePrefab, barrelPrefab, pillarPrefab, fireplacePrefab };
+        if(playerData.selectedFloor == -30){
+            roomCount = 1;
+            minRoomSize = 8;
+            maxRoomSize = 8;
+            maxAttempts = 100;
+            bufferSize = 1;
+            GenerateRooms();
+            SpawnPlayer();
+            SpawnEnemies();
+            return;
+        }
         GenerateRooms();
         ConnectRooms();
         SpawnPlayer();
@@ -613,31 +626,41 @@ public class GridManager : MonoBehaviour
                 Debug.LogError("Unknown enemy type!");
                 return;
         }
+        if(playerData.selectedFloor == -30){
+            enemyPrefab = enemyHighPrefab;
+            enemyPrefab.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+        }else{
+            enemyPrefab.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+        }
         GameObject enemy = Instantiate(enemyPrefab, position, Quaternion.identity);
         enemy.tag = "Enemy";
 
         Enemy enemyComponent = enemy.GetComponent<Enemy>();
-        if (enemyComponent != null)
-        {
-            switch (type)
+        if(playerData.selectedFloor == -30){
+            enemyComponent.enemyData = bossEnemyData;
+        }else{
+            if (enemyComponent != null)
             {
-                case "Low":
-                    enemyComponent.enemyData = lowEnemyData;
-                    break;
-                case "Medium":
-                    enemyComponent.enemyData = mediumEnemyData;
-                    break;
-                case "High":
-                    enemyComponent.enemyData = highEnemyData;
-                    break;
-                default:
-                    Debug.LogError("Unknown enemy type!");
-                    break;
+                switch (type)
+                {
+                    case "Low":
+                        enemyComponent.enemyData = lowEnemyData;
+                        break;
+                    case "Medium":
+                        enemyComponent.enemyData = mediumEnemyData;
+                        break;
+                    case "High":
+                        enemyComponent.enemyData = highEnemyData;
+                        break;
+                    default:
+                        Debug.LogError("Unknown enemy type!");
+                        break;
+                }
             }
-        }
-        else
-        {
-            Debug.LogError("Enemy script not found on the prefab!");
+            else
+            {
+                Debug.LogError("Enemy script not found on the prefab!");
+            }
         }
         TagTileAsEnemyTile(position);
     }
@@ -669,9 +692,22 @@ public class GridManager : MonoBehaviour
         {
             Vector3 enemyPosition = enemy.transform.position;
 
-            if (Vector3.Distance(playerPosition, enemyPosition) <= 3f)
+            float distanceToPlayer = Vector3.Distance(playerPosition, enemyPosition);
+
+            Enemy enemyScript = enemy.GetComponent<Enemy>();
+
+            if (distanceToPlayer <= 6f)
+            {
+                if (enemyScript != null)
+                {
+                    enemyScript.alert(); // Assuming Alert() is the method in the Enemy script for the alert state
+                }
+            }
+
+            if (distanceToPlayer <= 3f)
             {
                 // Rotate the enemy to face the player
+                enemyScript.aggro();
                 Vector3 directionToPlayer = (playerPosition - enemyPosition).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
                 enemy.transform.rotation = Quaternion.Slerp(enemy.transform.rotation, lookRotation, Time.deltaTime * 5f); // Smooth rotation

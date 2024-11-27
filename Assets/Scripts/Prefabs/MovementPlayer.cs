@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MovementPlayer : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class MovementPlayer : MonoBehaviour
     public float rotationSpeed = 720f;
     public bool isMoving = false;
     private Animator _animator;
+    public Text playerMessage;
+    public SoundManager soundManager;
 
     private void Awake()
     {
@@ -24,6 +27,10 @@ public class MovementPlayer : MonoBehaviour
         {
             _animator.SetBool("IsMoving", false);
         }
+    }
+
+    public void FootstepSFX(){
+        soundManager.walkSound();
     }
 
     public void MoveTo(Vector3 targetPosition)
@@ -153,7 +160,22 @@ public class MovementPlayer : MonoBehaviour
         return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.z - b.z);
     }
 
-    
+    public void levelUp(){
+        playerMessage.gameObject.SetActive(true);
+        playerMessage.text = "Level Up!!";
+        playerMessage.color = Color.yellow;
+        StartCoroutine(ResetMessage());
+    }
+
+    private IEnumerator ResetMessage()
+    {
+        // Wait for 0.5 seconds
+        yield return new WaitForSeconds(1f);
+
+        // Reset the message color to white (or the original color) and deactivate it
+        playerMessage.gameObject.SetActive(false);  // Optionally hide the message after a delay
+    }
+
     private class Node
     {
         public Vector3Int Position;
@@ -183,5 +205,9 @@ public class MovementPlayer : MonoBehaviour
         {
             return Position.GetHashCode();
         }
+    }
+
+    public void SwordSFX(){
+        soundManager.swordSound();
     }
 }

@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class Enemy : MonoBehaviour
     private Animator _animator;
     public Slider enemyHPBar;
     public PlayerDataSO playerData;
+    public Text message;
+    private bool idleState = false;
+    private bool aggroState = false;
+    public SoundManager soundManager;
 
     private void Awake() {
         _animator = GetComponent<Animator>();
@@ -54,9 +59,31 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        currentHP -= damage;
-        Debug.Log($"{enemyData.enemyName} took {damage} damage. Remaining HP: {currentHP}");
-        UpdateHPBar();
+        float critChance = playerData.defense.itemPoint * 0.01f;
+        float critDamage = playerData.sword.itemPoint * (1 + playerData.magic.itemPoint * 0.01f);
+        float realDamage = damage;
+
+        if (Random.value < critChance) 
+        {
+            realDamage = critDamage;
+        }
+
+        if(realDamage == damage){
+            message.color = Color.white;
+        }else{
+            message.color = new Color(1f, 0.647f, 0f);
+        }
+        
+        message.text = realDamage.ToString();
+        message.gameObject.SetActive(true);
+
+        currentHP -= (int)realDamage;
+        Debug.Log($"{enemyData.enemyName} took {realDamage} damage. Remaining HP: {currentHP}");
+
+        // UpdateHPBar();
+        StartCoroutine(SwordAnimation());
+
+        StartCoroutine(ResetMessage());
 
         if (currentHP <= 0)
         {
@@ -74,15 +101,63 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private IEnumerator SwordAnimation(){
+        yield return new WaitForSeconds(1f);
+        UpdateHPBar();
+    }
+
+    public void alert(){
+        if(idleState){
+            return;
+        }
+        idleState = true;
+        message.color = Color.white;
+        message.text = "??";
+        message.gameObject.SetActive(true);
+        StartCoroutine(ResetMessage());
+    }
+
+    public void aggro(){
+        soundManager.combatSound();
+        if(aggroState){
+            return;
+        }
+        idleState = true;
+        aggroState = true;
+        message.color = Color.red;
+        message.text = "!!";
+        message.gameObject.SetActive(true);
+        StartCoroutine(ResetMessage());
+    }
+
+    private IEnumerator ResetMessage()
+    {
+        // Wait for 0.5 seconds
+        yield return new WaitForSeconds(1f);
+
+        // Reset the message color to white (or the original color) and deactivate it
+        message.gameObject.SetActive(false);  // Optionally hide the message after a delay
+    }
+
     void Die()
     {
-        _animator.SetTrigger("Death");
+        soundManager.normalSound();
+        StartCoroutine(DeathAnimation());
         Debug.Log($"{enemyData.enemyName} has been defeated.");
         Destroy(gameObject, 2.5f); // Destroy the enemy after 2 seconds
+    }
+
+    private IEnumerator DeathAnimation(){
+        yield return new WaitForSeconds(1f);
+        _animator.SetTrigger("Death");
     }
 
     private void UpdateHPBar()
     {
         enemyHPBar.value = (float)currentHP/(float)enemyData.maxHP;
+    }
+
+    public void DeathSFX(){
+        soundManager.deathSound();
     }
 }

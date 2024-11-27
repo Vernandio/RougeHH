@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,8 +19,6 @@ public class GameManager : MonoBehaviour
     public GameObject escapeMenu;
     public GameObject gameOverMenu;
     public Text gameOverText;
-
-    
     int currentHealth;
     int maxExp;
 
@@ -70,12 +69,18 @@ public class GameManager : MonoBehaviour
             playerData.healPotion.itemPoint += playerData.playerLevel * 2;
             playerData.sword.itemPoint += (int)(playerData.playerLevel * 1.5);
             playerData.defense.itemPoint += (int)(playerData.playerLevel * 1.2);
+            MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
+            playerMovement.levelUp();
         }
 
         currentHealth = playerData.healPotion.itemPoint;
         maxExp = playerData.playerLevel * 1000;
         playerZhen.text = playerData.currentZhen.ToString();
-        currentFloor.text = "Floor " + playerData.selectedFloor; //Belum ada logicnya
+        if(playerData.selectedFloor == -30){
+            currentFloor.text = "BOSS";
+        }else{
+            currentFloor.text = "Floor " + playerData.selectedFloor; //Belum ada logicnya
+        }
         enemyCount.text = "Enemy left: 0"; //Belum ada logicnya
         playerLevel.text = "Level " + playerData.playerLevel.ToString();
         playerHP.text = currentHealth + "/" + playerData.healPotion.itemPoint.ToString();
