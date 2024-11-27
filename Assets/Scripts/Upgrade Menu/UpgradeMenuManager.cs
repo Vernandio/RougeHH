@@ -183,6 +183,9 @@ public class UpgradeMenuManager : MonoBehaviour
             if(playerData.playerExp >= playerData.playerLevel * 1000){
                 playerData.playerExp -= playerData.playerLevel * 1000;
                 playerData.playerLevel += 1;
+                playerData.healPotion.itemPoint += playerData.playerLevel * 2;
+                playerData.sword.itemPoint += (int)(playerData.playerLevel * 1.5);
+                playerData.defense.itemPoint += (int)(playerData.playerLevel * 1.2);
             }
             saveLoadSystem.SaveGame();
             audioSource.PlayOneShot(cheatCodeSound);

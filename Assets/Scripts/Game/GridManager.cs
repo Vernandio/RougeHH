@@ -19,7 +19,7 @@ public class GridManager : MonoBehaviour
     public int maxRoomSize = 12;
     public int maxAttempts = 100;
     public int bufferSize = 1;
-    private string[] attackAnimations = { "Attack", "Attack2", "Attack3"};
+    private string[] attackAnimations = {"Attack3", "Attack", "Attack2"};
 
     private List<Rect> rooms = new List<Rect>();
     private List<Vector3> validTilePositions = new List<Vector3>();
@@ -169,7 +169,7 @@ public class GridManager : MonoBehaviour
             validTilePositions.Add(position);
         }
 
-        for (int i = 0; i < 4 && roomPositions.Count > 0; i++)
+        for (int i = 0; i < 10 && roomPositions.Count > 0; i++)
         {
             Vector3 position = roomPositions[0];
             roomPositions.RemoveAt(0);
@@ -242,15 +242,25 @@ public class GridManager : MonoBehaviour
         return null;
     }
 
+    private List<GameObject> instantiatedTiles = new List<GameObject>();
+
     void CreateHallway(Vector3 start, Vector3 end)
     {
         Vector3 current = start;
 
+        // Horizontal creation
         while (Mathf.RoundToInt(current.x) != Mathf.RoundToInt(end.x))
         {
             Vector3 hallwayPosition = new Vector3(current.x, -0.0015f, current.z);
-            Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
 
+            // Remove existing tile if present
+            RemoveExistingTile(hallwayPosition);
+
+            // Instantiate new tile
+            GameObject newTile = Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
+            instantiatedTiles.Add(newTile);
+
+            // Add to valid tile positions if it's not already present
             if (!validTilePositions.Contains(hallwayPosition))
             {
                 validTilePositions.Add(hallwayPosition);
@@ -259,17 +269,39 @@ public class GridManager : MonoBehaviour
             current.x += current.x < end.x ? 1 : -1;
         }
 
+        // Vertical creation
         while (Mathf.RoundToInt(current.z) != Mathf.RoundToInt(end.z))
         {
             Vector3 hallwayPosition = new Vector3(current.x, -0.0020f, current.z);
-            Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
 
+            // Remove existing tile if present
+            RemoveExistingTile(hallwayPosition);
+
+            // Instantiate new tile
+            GameObject newTile = Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
+            instantiatedTiles.Add(newTile);
+
+            // Add to valid tile positions if it's not already present
             if (!validTilePositions.Contains(hallwayPosition))
             {
                 validTilePositions.Add(hallwayPosition);
             }
 
             current.z += current.z < end.z ? 1 : -1;
+        }
+    }
+
+    void RemoveExistingTile(Vector3 position)
+    {
+        // Assuming the tile is a GameObject that is at the given position, you can find it and delete it
+        Collider[] hitColliders = Physics.OverlapSphere(position, 0.1f); // Adjust the radius as needed
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.CompareTag("Decoration"))  // Replace "Tile" with the actual tag of the tiles
+            {
+                Destroy(hitCollider.gameObject);  // Destroy the tile GameObject
+                break;  // Exit once we find the tile at the position
+            }
         }
     }
 
@@ -426,7 +458,7 @@ public class GridManager : MonoBehaviour
 
             foreach (Collider collider in colliders)
             {
-                if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Player"))
+                if (collider.CompareTag("Decoration") || collider.CompareTag("Enemy") || collider.CompareTag("Player") || collider.CompareTag("Enemy_Tile"))
                 {
                     isOccupied = true;
                     break;
@@ -606,6 +638,21 @@ public class GridManager : MonoBehaviour
         else
         {
             Debug.LogError("Enemy script not found on the prefab!");
+        }
+        TagTileAsEnemyTile(position);
+    }
+
+    void TagTileAsEnemyTile(Vector3 position)
+    {
+        // Assuming the tile is a GameObject that is at the given position, you can find it and set the tag
+        Collider[] hitColliders = Physics.OverlapSphere(position, 0.1f); // Adjust the radius as needed
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.CompareTag("Tile"))  // Replace "Tile" with the actual tag of the tiles
+            {
+                hitCollider.gameObject.tag = "Enemy_Tile";  // Assign the "EnemyTile" tag to the tile
+                break;  // Exit once we find the tile at the position
+            }
         }
     }
 

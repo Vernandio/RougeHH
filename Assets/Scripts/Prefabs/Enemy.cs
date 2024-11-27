@@ -62,10 +62,13 @@ public class Enemy : MonoBehaviour
         {
             if(enemyData.maxHP == 10){
                 playerData.playerExp += 1000;
+                playerData.currentZhen += 2;
             }else if(enemyData.maxHP == 50){
                 playerData.playerExp += 500;
+                playerData.currentZhen += 15;
             }else if(enemyData.maxHP == 200){
                 playerData.playerExp += 1000;
+                playerData.currentZhen += 50;
             }
             Die();
         }

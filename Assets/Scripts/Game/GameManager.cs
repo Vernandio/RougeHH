@@ -16,10 +16,18 @@ public class GameManager : MonoBehaviour
     public Slider playerExpBar;
     public PlayerDataSO playerData;
     public GameObject escapeMenu;
+    public GameObject gameOverMenu;
+    public Text gameOverText;
+
+    
+    int currentHealth;
+    int maxExp;
 
     // Start is called before the first frame update
     void Start()
     {
+        currentHealth = playerData.healPotion.itemPoint;
+        maxExp = playerData.playerLevel * 1000;
         playerStats();
     }
 
@@ -40,6 +48,18 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1;
         }
         playerStats();
+        checkOver();
+    }
+
+    public void checkOver(){
+        int enemyLeft = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        if(enemyLeft <= 0){
+            gameOverText.text = "Floor Cleared";
+            gameOverMenu.SetActive(true);
+        }else if(currentHealth <= 0){
+            gameOverText.text = "Game Over";
+            gameOverMenu.SetActive(true);
+        }
     }
 
     public void playerStats(){
@@ -47,10 +67,13 @@ public class GameManager : MonoBehaviour
         if(playerData.playerExp >= playerData.playerLevel * 1000){
             playerData.playerExp -= playerData.playerLevel * 1000;
             playerData.playerLevel += 1;
+            playerData.healPotion.itemPoint += playerData.playerLevel * 2;
+            playerData.sword.itemPoint += (int)(playerData.playerLevel * 1.5);
+            playerData.defense.itemPoint += (int)(playerData.playerLevel * 1.2);
         }
 
-        int currentHealth = playerData.healPotion.itemPoint;
-        int maxExp = playerData.playerLevel * 1000;
+        currentHealth = playerData.healPotion.itemPoint;
+        maxExp = playerData.playerLevel * 1000;
         playerZhen.text = playerData.currentZhen.ToString();
         currentFloor.text = "Floor " + playerData.selectedFloor; //Belum ada logicnya
         enemyCount.text = "Enemy left: 0"; //Belum ada logicnya
