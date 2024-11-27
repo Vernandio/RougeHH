@@ -39,15 +39,15 @@ public class MovementPlayer : MonoBehaviour
             return;
         }
 
-        List<Vector3> path = FindPath(transform.position, targetPosition);
+        List<Vector3> path = findPath(transform.position, targetPosition);
         if (path != null && path.Count > 0)
         {
-            StartCoroutine(MoveAlongPath(path));
+            StartCoroutine(moveAlongPath(path));
         }
     }
 
 
-    private IEnumerator MoveAlongPath(List<Vector3> path)
+    private IEnumerator moveAlongPath(List<Vector3> path)
     {
         isMoving = true;
 
@@ -75,7 +75,7 @@ public class MovementPlayer : MonoBehaviour
         isMoving = false;
     }
 
-    public List<Vector3> FindPath(Vector3 start, Vector3 target)
+    public List<Vector3> findPath(Vector3 start, Vector3 target)
     {
         Vector3Int startTile = Vector3Int.RoundToInt(start);
         Vector3Int targetTile = Vector3Int.RoundToInt(target);
@@ -83,7 +83,7 @@ public class MovementPlayer : MonoBehaviour
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
 
-        Node startNode = new Node(startTile, null, 0, GetHeuristic(startTile, targetTile));
+        Node startNode = new Node(startTile, null, 0, getHeuristic(startTile, targetTile));
         openList.Add(startNode);
 
         while (openList.Count > 0)
@@ -102,10 +102,10 @@ public class MovementPlayer : MonoBehaviour
 
             if (currentNode.Position == targetTile)
             {
-                return ReconstructPath(currentNode);
+                return reconstructPath(currentNode);
             }
 
-            foreach (Vector3Int neighborPos in GetNeighbors(currentNode.Position))
+            foreach (Vector3Int neighborPos in getNeighbors(currentNode.Position))
             {
                 if (!GridManager.Instance.IsValidTile(neighborPos)) continue;
 
@@ -116,7 +116,7 @@ public class MovementPlayer : MonoBehaviour
                 Node neighborNode = openList.Find(n => n.Position == neighborPos);
                 if (neighborNode == null)
                 {
-                    neighborNode = new Node(neighborPos, currentNode, tentativeG, GetHeuristic(neighborPos, targetTile));
+                    neighborNode = new Node(neighborPos, currentNode, tentativeG, getHeuristic(neighborPos, targetTile));
                     openList.Add(neighborNode);
                 }
                 else if (tentativeG < neighborNode.G)
@@ -130,7 +130,7 @@ public class MovementPlayer : MonoBehaviour
     }
 
 
-    private List<Vector3> ReconstructPath(Node node)
+    private List<Vector3> reconstructPath(Node node)
     {
         List<Vector3> path = new List<Vector3>();
         while (node != null)
@@ -142,7 +142,7 @@ public class MovementPlayer : MonoBehaviour
         return path;
     }
 
-    private List<Vector3Int> GetNeighbors(Vector3Int position)
+    private List<Vector3Int> getNeighbors(Vector3Int position)
     {
         List<Vector3Int> neighbors = new List<Vector3Int>
         {
@@ -154,7 +154,7 @@ public class MovementPlayer : MonoBehaviour
         return neighbors;
     }
 
-    private int GetHeuristic(Vector3Int a, Vector3Int b)
+    private int getHeuristic(Vector3Int a, Vector3Int b)
     {
         // Manhattan distance as heuristic
         return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.z - b.z);
@@ -164,24 +164,21 @@ public class MovementPlayer : MonoBehaviour
         playerMessage.gameObject.SetActive(true);
         playerMessage.text = "Level Up!!";
         playerMessage.color = Color.yellow;
-        StartCoroutine(ResetMessage());
+        StartCoroutine(resetMessage());
     }
 
     public void getDamage(int damage){
-        Debug.Log("MASUK MOVEMENTPLAYER");
         playerMessage.gameObject.SetActive(true);
         playerMessage.text = damage.ToString();
         playerMessage.color = Color.red;
-        StartCoroutine(ResetMessage());
+        StartCoroutine(resetMessage());
     }
 
-    private IEnumerator ResetMessage()
+    private IEnumerator resetMessage()
     {
-        // Wait for 0.5 seconds
         yield return new WaitForSeconds(1f);
 
-        // Reset the message color to white (or the original color) and deactivate it
-        playerMessage.gameObject.SetActive(false);  // Optionally hide the message after a delay
+        playerMessage.gameObject.SetActive(false);
     }
 
     private class Node

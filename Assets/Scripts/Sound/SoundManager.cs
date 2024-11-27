@@ -15,26 +15,22 @@ public class SoundManager : MonoBehaviour
 
     void Awake()
     {
-        // If there's no instance of SoundManager, set it to this one
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);  // Optional: Keep this object persistent across scenes
+            DontDestroyOnLoad(gameObject); 
         }
         else
         {
-            Destroy(gameObject);  // If an instance already exists, destroy this one
+            Destroy(gameObject);
         }
     }
-
-    // Start is called before the first frame update
 
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         

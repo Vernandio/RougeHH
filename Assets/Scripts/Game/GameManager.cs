@@ -23,14 +23,6 @@ public class GameManager : MonoBehaviour
     int currentHealth;
     int maxExp;
 
-    public void PlayerTakeDamage(int damage){
-        Debug.Log("MASUK SINI WOYYY" + damage);
-        currentHealth -= damage;
-        MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
-        playerMovement.getDamage(damage);
-        playerStats();
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -64,6 +56,13 @@ public class GameManager : MonoBehaviour
         }
         playerStats();
         checkOver();
+    }
+
+    public void PlayerTakeDamage(int damage){
+        currentHealth -= damage;
+        MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
+        playerMovement.getDamage(damage);
+        playerStats();
     }
 
     public void checkOver(){

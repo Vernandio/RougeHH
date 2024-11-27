@@ -340,13 +340,13 @@ public class GridManager : MonoBehaviour
                 Vector3 targetPosition = hit.collider.transform.position;
                 if (playerMovement.isMoving)
                 {
-                    List<Vector3> path = playerMovement.FindPath(targetPosition, targetPosition);
+                    List<Vector3> path = playerMovement.findPath(targetPosition, targetPosition);
                     HighlightPath(path);
                     return;
                 }
                 if (playerMovement != null && IsValidTile(targetPosition))
                 {
-                    List<Vector3> path = playerMovement.FindPath(playerMovement.transform.position, targetPosition);
+                    List<Vector3> path = playerMovement.findPath(playerMovement.transform.position, targetPosition);
                     HighlightPath(path);
                 }
             }

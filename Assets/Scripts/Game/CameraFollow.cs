@@ -3,11 +3,9 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     public static CameraFollow Instance { get; private set; }
-
     public Transform player;
     public Vector3 pivotOffset = new Vector3(0, 0, 0);
     public float smoothSpeed = 0.125f;
-
     private Transform mainCamera;
 
     void Awake()
@@ -21,12 +19,7 @@ public class CameraFollow : MonoBehaviour
             Destroy(gameObject);
         }
 
-        // Find the Main Camera as a child of this pivot
         mainCamera = transform.Find("Main Camera");
-        if (mainCamera == null)
-        {
-            Debug.LogError("Main Camera not found as a child of Pivot Camera.");
-        }
     }
 
     void LateUpdate()
@@ -37,7 +30,6 @@ public class CameraFollow : MonoBehaviour
             return;
         }
 
-        // Smoothly follow the player with the pivot
         Vector3 desiredPosition = player.position + pivotOffset;
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
         transform.position = smoothedPosition;

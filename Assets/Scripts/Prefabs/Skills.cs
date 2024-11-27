@@ -13,14 +13,12 @@ public class Skills : MonoBehaviour
     public GameObject hover;
     public Text hoverText;
 
-    // Start is called before the first frame update
     void Start()
     {
         imageName = skillImage.sprite.name;
         hover.SetActive(false);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(slot.text == "-"){
@@ -33,7 +31,6 @@ public class Skills : MonoBehaviour
         }
     }
 
-    // Method to handle mouse enter event for hover effect
     public void OnMouseEnter(string type)
     {
         hover.SetActive(true);

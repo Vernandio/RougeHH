@@ -6,7 +6,7 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
-    public EnemyDataSO enemyData; // Reference to the ScriptableObject
+    public EnemyDataSO enemyData;
     public int currentHP;
     public TextMeshPro nameText;
     private Animator _animator;
@@ -34,7 +34,7 @@ public class Enemy : MonoBehaviour
         {
             nameText = GetComponentInChildren<TextMeshPro>();
             nameText.text = GetRandomEnemyName();
-            currentHP = enemyData.maxHP; // Initialize current HP
+            currentHP = enemyData.maxHP;
             Debug.Log($"{enemyData.enemyName} spawned with {currentHP} HP and {enemyData.damage} damage.");
         }
         else
@@ -57,6 +57,7 @@ public class Enemy : MonoBehaviour
         return enemyNames[randomIndex];
     }
 
+    private int defenseScalingFactor;
     public void TakeDamage(int damage)
     {
         int defense = enemyData.defense;
@@ -94,48 +95,23 @@ public class Enemy : MonoBehaviour
         currentHP -= (int)realDamage;
         Debug.Log($"{enemyData.enemyName} took {realDamage} damage. Remaining HP: {currentHP}");
 
-        // UpdateHPBar();
-        StartCoroutine(SwordAnimation());
+        StartCoroutine(swordAnimation());
 
-        StartCoroutine(ResetMessage());
+        StartCoroutine(resetMessage());
 
         if (currentHP <= 0)
         {
-            StartCoroutine(SwordAnimation2());
+            StartCoroutine(swordAnimation2());
             return;
         }
-
-        // StartCoroutine(AttackTurn());
     }
 
-
-    private int defenseScalingFactor;
-    private IEnumerator AttackTurn(){
+    private IEnumerator swordAnimation(){
         yield return new WaitForSeconds(1f);
-        // _animator.SetTrigger("Attack");
-        int defense = playerData.armor.itemPoint;
-        if(enemyData.damage == 2){
-            defenseScalingFactor = Random.Range(100, 201);
-        }else if(enemyData.damage == 10){
-            defenseScalingFactor = Random.Range(50, 101);
-        }else if(enemyData.damage == 50){
-            defenseScalingFactor = Random.Range(20, 51);
-        }
-
-        int defenseFactor = 1 - (defense / (defense + defenseScalingFactor));
-        int damageOutput = enemyData.damage * defenseFactor;
-
-        if (GameManager.Instance == null)
-        {
-            Debug.LogError("GameManager instance is null!");
-        }
-        else
-        {
-            GameManager.Instance.PlayerTakeDamage(damageOutput);  // Call PlayerTakeDamage() to apply the damage to the player
-        }
+        updateHPBar();
     }
 
-    private IEnumerator SwordAnimation2(){
+    private IEnumerator swordAnimation2(){
         yield return new WaitForSeconds(1.5f);
         if(enemyData.maxHP == 10){
             playerData.playerExp += 1000;
@@ -150,11 +126,6 @@ public class Enemy : MonoBehaviour
         Die();
     }
 
-    private IEnumerator SwordAnimation(){
-        yield return new WaitForSeconds(1f);
-        UpdateHPBar();
-    }
-
     public void alert(){
         if(idleState){
             return;
@@ -163,7 +134,7 @@ public class Enemy : MonoBehaviour
         message.color = Color.white;
         message.text = "??";
         message.gameObject.SetActive(true);
-        StartCoroutine(ResetMessage());
+        StartCoroutine(resetMessage());
     }
 
     public void aggro(){
@@ -176,32 +147,29 @@ public class Enemy : MonoBehaviour
         message.color = Color.red;
         message.text = "!!";
         message.gameObject.SetActive(true);
-        StartCoroutine(ResetMessage());
+        StartCoroutine(resetMessage());
     }
 
-    private IEnumerator ResetMessage()
+    private IEnumerator resetMessage()
     {
-        // Wait for 0.5 seconds
         yield return new WaitForSeconds(1f);
 
-        // Reset the message color to white (or the original color) and deactivate it
-        message.gameObject.SetActive(false);  // Optionally hide the message after a delay
+        message.gameObject.SetActive(false);
     }
 
     void Die()
     {
-        // soundManager.normalSound();
-        StartCoroutine(DeathAnimation());
+        StartCoroutine(deathAnimation());
         Debug.Log($"{enemyData.enemyName} has been defeated.");
-        Destroy(gameObject, 2.5f); // Destroy the enemy after 2 seconds
+        Destroy(gameObject, 2.5f);
     }
 
-    private IEnumerator DeathAnimation(){
+    private IEnumerator deathAnimation(){
         yield return new WaitForSeconds(1f);
         _animator.SetTrigger("Death");
     }
 
-    private void UpdateHPBar()
+    private void updateHPBar()
     {
         enemyHPBar.value = (float)currentHP/(float)enemyData.maxHP;
     }
