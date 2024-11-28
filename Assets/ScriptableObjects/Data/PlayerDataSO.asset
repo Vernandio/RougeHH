@@ -15,6 +15,7 @@ MonoBehaviour:
   playerLevel: 1
   playerExp: 0
   floorLevel: 100
+  selectedFloor: 0
   currentZhen: 0
   healPotion:
     itemLevel: 1
@@ -36,3 +37,7 @@ MonoBehaviour:
     itemLevel: 1
     itemPrice: 10
     itemPoint: 150
+  OnPlayerExpUpdated: {fileID: 11400000, guid: 1364b27d10dc8d94aba4cc03163468a6, type: 2}
+  OnZhenUpdated: {fileID: 11400000, guid: 1364b27d10dc8d94aba4cc03163468a6, type: 2}
+  OnItemUpdated: {fileID: 11400000, guid: 42642da98bd548746af64d1ba6502a1f, type: 2}
+  OnFloorUpdated: {fileID: 11400000, guid: 1364b27d10dc8d94aba4cc03163468a6, type: 2}

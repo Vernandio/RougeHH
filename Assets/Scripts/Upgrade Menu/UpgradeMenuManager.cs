@@ -74,14 +74,20 @@ public class UpgradeMenuManager : MonoBehaviour
         switch(itemName.text){
             case "Health Up":
                 if(playerData.currentZhen >= playerData.healPotion.itemPrice && playerData.healPotion.itemLevel < 50){
-                    playerData.currentZhen -= playerData.healPotion.itemPrice;
-                    playerData.healPotion.itemPrice += 50;
-                    playerData.sword.itemPrice += 10;
-                    playerData.armor.itemPrice += 10;
-                    playerData.defense.itemPrice += 10;
-                    playerData.magic.itemPrice += 10;
-                    playerData.healPotion.itemPoint += 10;
-                    playerData.healPotion.itemLevel += 1;
+                    // playerData.currentZhen -= playerData.healPotion.itemPrice;
+                    // playerData.healPotion.itemPrice += 50;
+                    // playerData.sword.itemPrice += 10;
+                    // playerData.armor.itemPrice += 10;
+                    // playerData.defense.itemPrice += 10;
+                    // playerData.magic.itemPrice += 10;
+                    // playerData.healPotion.itemPoint += 10;
+                    // playerData.healPotion.itemLevel += 1;
+
+                    //Tambahan Event Channel
+                    playerData.UpdateItem(ref playerData.healPotion, playerData.healPotion.itemLevel+1, playerData.healPotion.itemPrice+50, playerData.healPotion.itemPoint+10);
+                    playerData.UpdateZhen(-playerData.healPotion.itemPrice);
+                    //Testing
+
                     currentZhen.text = playerData.currentZhen.ToString();
                     updateItemDetails("heal");
                     audioSource.PlayOneShot(purchaseSFX);
@@ -99,14 +105,20 @@ public class UpgradeMenuManager : MonoBehaviour
                 break;
             case "Attack Up":
                 if(playerData.currentZhen >= playerData.sword.itemPrice && playerData.sword.itemLevel < 50){
-                    playerData.currentZhen -= playerData.sword.itemPrice;
-                    playerData.sword.itemPrice += 50;
-                    playerData.healPotion.itemPrice += 10;
-                    playerData.armor.itemPrice += 10;
-                    playerData.defense.itemPrice += 10;
-                    playerData.magic.itemPrice += 10;
-                    playerData.sword.itemPoint += 2;
-                    playerData.sword.itemLevel += 1;
+                    // playerData.currentZhen -= playerData.sword.itemPrice;
+                    // playerData.sword.itemPrice += 50;
+                    // playerData.healPotion.itemPrice += 10;
+                    // playerData.armor.itemPrice += 10;
+                    // playerData.defense.itemPrice += 10;
+                    // playerData.magic.itemPrice += 10;
+                    // playerData.sword.itemPoint += 2;
+                    // playerData.sword.itemLevel += 1;
+
+                    //Tambahan Event Channel
+                    playerData.UpdateItem(ref playerData.sword, playerData.sword.itemLevel+1, playerData.sword.itemPrice+50, playerData.sword.itemPoint+2);
+                    playerData.UpdateZhen(-playerData.sword.itemPrice);
+                    //Testing
+
                     currentZhen.text = playerData.currentZhen.ToString();
                     updateItemDetails("sword");
                     audioSource.PlayOneShot(purchaseSFX);
@@ -124,14 +136,20 @@ public class UpgradeMenuManager : MonoBehaviour
                     break;
             case "Defense Up":
                 if(playerData.currentZhen >= playerData.armor.itemPrice && playerData.armor.itemLevel < 50){
-                    playerData.currentZhen -= playerData.armor.itemPrice;
-                    playerData.armor.itemPrice += 50;
-                    playerData.healPotion.itemPrice += 10;
-                    playerData.sword.itemPrice += 10;
-                    playerData.defense.itemPrice += 10;
-                    playerData.magic.itemPrice += 10;
-                    playerData.armor.itemPoint += 2;
-                    playerData.armor.itemLevel += 1;
+                    // playerData.currentZhen -= playerData.armor.itemPrice;
+                    // playerData.armor.itemPrice += 50;
+                    // playerData.healPotion.itemPrice += 10;
+                    // playerData.sword.itemPrice += 10;
+                    // playerData.defense.itemPrice += 10;
+                    // playerData.magic.itemPrice += 10;
+                    // playerData.armor.itemPoint += 2;
+                    // playerData.armor.itemLevel += 1;
+
+                    //Tambahan Event Channel
+                    playerData.UpdateItem(ref playerData.armor, playerData.armor.itemLevel+1, playerData.armor.itemPrice+50, playerData.armor.itemPoint+2);
+                    playerData.UpdateZhen(-playerData.armor.itemPrice);
+                    //Testing
+
                     currentZhen.text = playerData.currentZhen.ToString();
                     updateItemDetails("armor");
                     audioSource.PlayOneShot(purchaseSFX);
@@ -149,14 +167,20 @@ public class UpgradeMenuManager : MonoBehaviour
                     break;
             case "Luck Up":
                 if(playerData.currentZhen >= playerData.defense.itemPrice && playerData.defense.itemLevel < 50){
-                        playerData.currentZhen -= playerData.defense.itemPrice;
-                        playerData.defense.itemPrice += 50;
-                        playerData.healPotion.itemPrice += 10;
-                        playerData.sword.itemPrice += 10;
-                        playerData.armor.itemPrice += 10;
-                        playerData.magic.itemPrice += 10;
-                        playerData.defense.itemPoint += 2;
-                        playerData.defense.itemLevel += 1;
+                        // playerData.currentZhen -= playerData.defense.itemPrice;
+                        // playerData.defense.itemPrice += 50;
+                        // playerData.healPotion.itemPrice += 10;
+                        // playerData.sword.itemPrice += 10;
+                        // playerData.armor.itemPrice += 10;
+                        // playerData.magic.itemPrice += 10;
+                        // playerData.defense.itemPoint += 5;
+                        // playerData.defense.itemLevel += 1;
+
+                        //Tambahan Event Channel
+                        playerData.UpdateItem(ref playerData.defense, playerData.defense.itemLevel+1, playerData.defense.itemPrice+50, playerData.defense.itemPoint+5);
+                        playerData.UpdateZhen(-playerData.defense.itemPrice);
+                        //Testing
+
                         currentZhen.text = playerData.currentZhen.ToString();
                         updateItemDetails("defense");
                         audioSource.PlayOneShot(purchaseSFX);
@@ -174,14 +198,20 @@ public class UpgradeMenuManager : MonoBehaviour
                 break;
             case "Crit Dmg Up":
                 if(playerData.currentZhen >= playerData.magic.itemPrice && playerData.magic.itemLevel < 50){
-                        playerData.currentZhen -= playerData.magic.itemPrice;
-                        playerData.magic.itemPrice += 50;
-                        playerData.healPotion.itemPrice += 10;
-                        playerData.sword.itemPrice += 10;
-                        playerData.armor.itemPrice += 10;
-                        playerData.defense.itemPrice += 10;
-                        playerData.magic.itemPoint += 5;
-                        playerData.magic.itemLevel += 1;
+                        // playerData.currentZhen -= playerData.magic.itemPrice;
+                        // playerData.magic.itemPrice += 50;
+                        // playerData.healPotion.itemPrice += 10;
+                        // playerData.sword.itemPrice += 10;
+                        // playerData.armor.itemPrice += 10;
+                        // playerData.defense.itemPrice += 10;
+                        // playerData.magic.itemPoint += 5;
+                        // playerData.magic.itemLevel += 1;
+
+                        //Tambahan Event Channel
+                        playerData.UpdateItem(ref playerData.magic, playerData.magic.itemLevel+1, playerData.magic.itemPrice+50, playerData.magic.itemPoint+5);
+                        playerData.UpdateZhen(-playerData.magic.itemPrice);
+                        //Testing
+
                         currentZhen.text = playerData.currentZhen.ToString();
                         updateItemDetails("magic");
                         audioSource.PlayOneShot(purchaseSFX);
@@ -204,7 +234,8 @@ public class UpgradeMenuManager : MonoBehaviour
     {
         if (text == "hesoyam")
         {
-            playerData.playerExp += 500;
+            playerData.UpdatePlayerExp(500);
+            // playerData.playerExp += 500;
             if(playerData.playerExp >= playerData.playerLevel * 1000){
                 playerData.playerExp -= playerData.playerLevel * 1000;
                 playerData.playerLevel += 1;
@@ -216,12 +247,14 @@ public class UpgradeMenuManager : MonoBehaviour
             audioSource.PlayOneShot(cheatCodeSound);
             inputField.text = "";
         }else if(text == "tpagamegampang"){
-            playerData.currentZhen += 20000;
+            // playerData.currentZhen += 20000;
+            playerData.UpdateZhen(20000);
             saveLoadSystem.SaveGame();
             audioSource.PlayOneShot(cheatCodeSound);
             inputField.text = "";
         }else if(text == "opensesame"){
-            playerData.floorLevel = 101;
+            // playerData.floorLevel = 101;
+            playerData.UpdateFloor(101);
             saveLoadSystem.SaveGame();
             audioSource.PlayOneShot(cheatCodeSound);
             inputField.text = "";

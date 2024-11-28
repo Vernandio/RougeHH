@@ -23,4 +23,48 @@ public class PlayerDataSO : ScriptableObject
     public Item armor;
     public Item defense;
     public Item magic;
-}
+
+    //Tambahan Event Channel
+    public EventChannelSO_Int OnPlayerExpUpdated;
+    public EventChannelSO_Int OnZhenUpdated;
+    public EventChannelSO_Item OnItemUpdated;
+    public EventChannelSO_Int OnFloorUpdated;
+    // Method to Update Player's Experience and Raise Event
+    public void UpdatePlayerExp(int amount)
+    {
+        playerExp += amount;
+        OnPlayerExpUpdated.RaiseEvent(playerExp);  // Notify listeners of the update
+    }
+
+    // Method to Update Zhen and Raise Event
+    public void UpdateZhen(int amount)
+    {
+        currentZhen += amount;
+        OnZhenUpdated.RaiseEvent(currentZhen);  // Notify listeners of the update
+    }
+
+    // Method to Update an Item and Raise Event
+    public void UpdateItem(ref Item item, int newLevel, int newPrice, int newPoint)
+    {
+        item.itemLevel = newLevel;
+        item.itemPrice = newPrice;
+        item.itemPoint = newPoint;
+
+        List<Item> allItems = new List<Item> { healPotion, sword, armor, defense, magic };
+
+        foreach (var otherItem in allItems)
+        {
+            if (otherItem != item)
+            {
+                otherItem.itemPrice += 10;
+            }
+        }
+
+        OnItemUpdated.RaiseEvent(item);  // Notify listeners that an item has been updated
+    }
+
+    public void UpdateFloor(int floor){
+        floorLevel = floor;
+        OnFloorUpdated.RaiseEvent(floorLevel);
+    }
+}   
