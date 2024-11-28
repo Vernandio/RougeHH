@@ -26,7 +26,14 @@ public class Enemy : MonoBehaviour
         enemyHPBar.value = 1;
         enemyHPBar.interactable = false;
         InitializeEnemy();
+        // TurnManager.Instance.OnTurnChanged += HandleTurnChange;
     }
+
+    // void OnDestroy()
+    // {
+    //     // Unsubscribe to avoid memory leaks
+    //     TurnManager.Instance.OnTurnChanged -= HandleTurnChange;
+    // }
 
     void InitializeEnemy()
     {
@@ -181,4 +188,180 @@ public class Enemy : MonoBehaviour
     public void PunchSFX(){
         soundManager.punchSound();
     }
+
+    //Test add move
+
+    private void HandleTurnChange()
+    {
+        if (TurnManager.Instance.IsEnemyTurn() && aggroState)
+        {
+            StartCoroutine(EnemyTurn());
+        }
+    }
+
+    private IEnumerator EnemyTurn()
+    {
+        // Move towards player one tile at a time
+        MoveTowardsPlayer();
+
+        // Wait for the movement to finish, then end the turn
+        yield return new WaitForSeconds(1f);  // Adjust the time based on your move speed
+        TurnManager.Instance.EndTurn();  // End the enemy's turn
+    }
+    
+    public void MoveTowardsPlayer()
+    {
+        if (aggroState)
+        {
+            Vector3 playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;  // Assuming you store player position as a Vector3 in playerData
+
+            // Find path to player using A*
+            List<Vector3> path = FindPath(transform.position, playerPosition);
+            if (path != null && path.Count > 0)
+            {
+                StartCoroutine(MoveOneTileAtATime(path));
+            }
+        }
+    }
+
+    // Move one tile at a time towards the player
+    private IEnumerator MoveOneTileAtATime(List<Vector3> path)
+    {
+        if (path.Count == 0) yield break;
+
+        Vector3 destination = path[0];
+        Vector3 direction = (destination - transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+        // Rotate towards the destination tile
+        while (Quaternion.Angle(transform.rotation, targetRotation) > 0.1f)
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, 720f * Time.deltaTime);
+            yield return null;
+        }
+
+        // Move the enemy
+        while (Vector3.Distance(transform.position, destination) > 0.1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, destination, 5f * Time.deltaTime);
+            yield return null;
+        }
+
+        transform.position = destination;
+
+        // Attack the player if adjacent
+        if (Vector3.Distance(transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 1.5f)
+        {
+            AttackPlayer();
+        }
+    }
+
+    // Attack the player if adjacent
+    public void AttackPlayer()
+    {
+        Debug.Log("INSERT ATTACK LOGIC HERE");
+    }
+
+    // A* Pathfinding method (simplified)
+    public List<Vector3> FindPath(Vector3 start, Vector3 target)
+    {
+        Vector3Int startTile = Vector3Int.RoundToInt(start);
+        Vector3Int targetTile = Vector3Int.RoundToInt(target);
+
+        // Implement your A* pathfinding here
+        List<Node> openList = new List<Node>();
+        HashSet<Node> closedList = new HashSet<Node>();
+
+        Node startNode = new Node(startTile, null, 0, GetHeuristic(startTile, targetTile));
+        openList.Add(startNode);
+
+        while (openList.Count > 0)
+        {
+            Node currentNode = openList[0];
+            foreach (Node node in openList)
+            {
+                if (node.FCost < currentNode.FCost || (node.FCost == currentNode.FCost && node.HCost < currentNode.HCost))
+                    currentNode = node;
+            }
+
+            openList.Remove(currentNode);
+            closedList.Add(currentNode);
+
+            if (currentNode.Position == targetTile)
+            {
+                return RetracePath(startNode, currentNode);
+            }
+
+            foreach (Vector3Int neighbor in GetNeighbors(currentNode.Position))
+            {
+                if (closedList.Contains(new Node(neighbor, null, 0, 0))) continue;
+
+                float gCost = currentNode.GCost + 1;  // assuming each tile is 1 distance away
+                float hCost = GetHeuristic(neighbor, targetTile);
+                Node neighborNode = new Node(neighbor, currentNode, gCost, hCost);
+
+                if (!openList.Contains(neighborNode))
+                {
+                    openList.Add(neighborNode);
+                }
+            }
+        }
+
+        return null;  // Return null if no path found
+    }
+
+    private List<Vector3Int> GetNeighbors(Vector3Int node)
+    {
+        List<Vector3Int> neighbors = new List<Vector3Int>
+        {
+            new Vector3Int(node.x + 1, node.y, node.z),
+            new Vector3Int(node.x - 1, node.y, node.z),
+            new Vector3Int(node.x, node.y, node.z + 1),
+            new Vector3Int(node.x, node.y, node.z - 1)
+        };
+
+        return neighbors;
+    }
+
+    private float GetHeuristic(Vector3Int start, Vector3Int target)
+    {
+        return Mathf.Abs(start.x - target.x) + Mathf.Abs(start.z - target.z);
+    }
+
+    private List<Vector3> RetracePath(Node startNode, Node endNode)
+    {
+        List<Vector3> path = new List<Vector3>();
+        Node currentNode = endNode;
+
+        while (currentNode != startNode)
+        {
+            path.Add(currentNode.Position);
+            currentNode = currentNode.Parent;
+        }
+        path.Reverse();
+
+        return path;
+    }
+
+    // Node class for A* pathfinding
+    private class Node
+    {
+        public Vector3Int Position;
+        public Node Parent;
+        public float GCost;
+        public float HCost;
+
+        public float FCost => GCost + HCost;
+
+        public Node(Vector3Int position, Node parent, float gCost, float hCost)
+        {
+            Position = position;
+            Parent = parent;
+            GCost = gCost;
+            HCost = hCost;
+        }
+    }
+
+
+
 }

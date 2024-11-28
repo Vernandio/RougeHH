@@ -50,7 +50,6 @@ public class GridManager : MonoBehaviour
 
     [Header("Materials")]
     public Material normalStoneMaterial; // Public variable for normal stone material
-
     private GameObject[] decorationPrefabs;
     private Dictionary<Renderer, Material> originalTileMaterials = new Dictionary<Renderer, Material>(); // Store original materials
     private Animator _animator;
