@@ -182,7 +182,7 @@ public class GridManager : MonoBehaviour
             validTilePositions.Add(position);
         }
 
-        for (int i = 0; i < 10 && roomPositions.Count > 0; i++)
+        for (int i = 0; i < 7 && roomPositions.Count > 0; i++)
         {
             Vector3 position = roomPositions[0];
             roomPositions.RemoveAt(0);

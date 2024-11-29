@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using EZCameraShake;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,7 +46,6 @@ public class MovementPlayer : MonoBehaviour
             StartCoroutine(moveAlongPath(path));
         }
     }
-
 
     private IEnumerator moveAlongPath(List<Vector3> path)
     {
@@ -214,5 +214,6 @@ public class MovementPlayer : MonoBehaviour
 
     public void SwordSFX(){
         soundManager.swordSound();
+        CameraShaker.Instance.ShakeOnce(3f, 3f, 0.5f, 0.5f);
     }
 }

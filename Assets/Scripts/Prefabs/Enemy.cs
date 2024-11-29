@@ -3,6 +3,7 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Collections;
+using EZCameraShake;
 
 public class Enemy : MonoBehaviour
 {
@@ -187,6 +188,7 @@ public class Enemy : MonoBehaviour
 
     public void PunchSFX(){
         soundManager.punchSound();
+        CameraShaker.Instance.ShakeOnce(3f, 3f, 0.5f, 0.5f);
     }
 
     //Test add move
