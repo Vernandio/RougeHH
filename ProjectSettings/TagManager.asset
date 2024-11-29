@@ -10,6 +10,8 @@ TagManager:
   - Hallway
   - Enemy_Tile
   - Sword
+  - Passive_1
+  - Passive_2
   layers:
   - Default
   - TransparentFX

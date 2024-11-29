@@ -31,18 +31,51 @@ public class GameManager : MonoBehaviour
         playerStats();
     }
 
+    private GameObject FindChildWithTag(Transform parent, string tag)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.CompareTag(tag))
+            {
+                return child.gameObject; // Return the GameObject if found
+            }
+
+            // Recursively search in this child's children
+            GameObject found = FindChildWithTag(child, tag);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        // Return null if not found
+        return null;
+    }
+
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape)){
             bool isActive = escapeMenu.activeSelf;
             escapeMenu.SetActive(!isActive); // Toggle active state
-        }else if(Input.GetKeyDown(KeyCode.Alpha1)){
-            Debug.Log("1 Clicked");
+        }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3){
+            GameObject parent = GameObject.FindGameObjectWithTag("Player");
+            GameObject passive = FindChildWithTag(parent.transform, "Passive_1");
+            if(passive.activeSelf){
+                passive.SetActive(false);
+            }else{
+                passive.SetActive(true);
+            }
         }else if(Input.GetKeyDown(KeyCode.Alpha2)){
             Debug.Log("2 Clicked");
-        }else if(Input.GetKeyDown(KeyCode.Alpha3)){
-            Debug.Log("3 Clicked");
+        }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5){
+            GameObject parent = GameObject.FindGameObjectWithTag("Player");
+            GameObject passive = FindChildWithTag(parent.transform, "Passive_2");
+            if(passive.activeSelf){
+                passive.SetActive(false);
+            }else{
+                passive.SetActive(true);
+            }
         }
 
 
