@@ -31,6 +31,51 @@ public class GameManager : MonoBehaviour
         playerStats();
     }
 
+    private void TogglePassive(string passiveName)
+    {
+        GameObject parent = GameObject.FindGameObjectWithTag("Player");
+        if(passiveName == "Physical_1"){
+            parent = GameObject.FindGameObjectWithTag("Skill2");
+        }
+        GameObject passive = FindChildWithTag(parent.transform, passiveName);
+
+        if (passive.activeSelf && passiveName == "Physical_1")
+        {
+            passive.SetActive(false);
+        }
+        else
+        {
+            passive.SetActive(true);
+            if(passiveName == "Physical_1"){
+                return;
+            }else if(passiveName == "Passive_1"){
+                GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
+                GameObject active = FindChildWithTag(holder.transform, "Skill1");
+                active.SetActive(true);
+            }else if(passiveName == "Passive_2"){
+                GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
+                GameObject active = FindChildWithTag(holder.transform, "Skill3");
+                active.SetActive(true);
+            }
+            StartCoroutine(DeactivatePassiveAfterTime(passive, 10f, passiveName)); // Start the 10-second timer
+        }
+    }
+
+    private IEnumerator DeactivatePassiveAfterTime(GameObject passive, float time, string passiveName)
+    {
+        yield return new WaitForSeconds(time);
+        passive.SetActive(false);
+        if(passiveName == "Passive_1"){
+            GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
+            GameObject active = FindChildWithTag(holder.transform, "Skill1");
+            active.SetActive(false);
+        }else if(passiveName == "Passive_2"){
+            GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
+            GameObject active = FindChildWithTag(holder.transform, "Skill3");
+            active.SetActive(false);
+        }
+    }
+
     private GameObject FindChildWithTag(Transform parent, string tag)
     {
         foreach (Transform child in parent)
@@ -59,25 +104,12 @@ public class GameManager : MonoBehaviour
             bool isActive = escapeMenu.activeSelf;
             escapeMenu.SetActive(!isActive); // Toggle active state
         }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3){
-            GameObject parent = GameObject.FindGameObjectWithTag("Player");
-            GameObject passive = FindChildWithTag(parent.transform, "Passive_1");
-            if(passive.activeSelf){
-                passive.SetActive(false);
-            }else{
-                passive.SetActive(true);
-            }
-        }else if(Input.GetKeyDown(KeyCode.Alpha2)){
-            Debug.Log("2 Clicked");
+            TogglePassive("Passive_1");
+        }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4){
+            TogglePassive("Physical_1");
         }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5){
-            GameObject parent = GameObject.FindGameObjectWithTag("Player");
-            GameObject passive = FindChildWithTag(parent.transform, "Passive_2");
-            if(passive.activeSelf){
-                passive.SetActive(false);
-            }else{
-                passive.SetActive(true);
-            }
+            TogglePassive("Passive_2");
         }
-
 
         if (escapeMenu.activeSelf)
         {
@@ -144,6 +176,11 @@ public class GameManager : MonoBehaviour
     {
         int enemyLeft = GameObject.FindGameObjectsWithTag("Enemy").Length;
         enemyCount.text = "Enemy left: " + enemyLeft;
+    }
+
+    public void lifeSteal(int health){
+        currentHealth += health;
+        playerStats();
     }
 
     public void resume(){

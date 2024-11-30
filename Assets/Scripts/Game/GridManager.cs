@@ -398,8 +398,23 @@ public class GridManager : MonoBehaviour
                             Enemy enemyScript = enemy.GetComponent<Enemy>();
                             if (enemyScript != null)
                             {
+                                GameObject skill1 = GameObject.FindGameObjectWithTag("Passive_1");
+                                GameObject skill2 = GameObject.FindGameObjectWithTag("Physical_1");
+                                GameObject skill3 = GameObject.FindGameObjectWithTag("Passive_2");
+                                int damage = playerData.sword.itemPoint;
+                                if(skill1 != null){
+                                    gameManager.lifeSteal(damage * 20 / 100);
+                                }
+                                if(skill2 != null){
+                                    damage += damage * 150 / 100;
+                                    skill2.SetActive(false);
+                                }
+                                if(skill3 != null){
+                                    damage += damage * 20 / 100;
+                                }
+
                                 Animator animator = enemy.GetComponent<Animator>();
-                                enemyScript.TakeDamage(playerData.sword.itemPoint);
+                                enemyScript.TakeDamage(damage);
                                 if(enemyScript.currentHP > 0){
                                     StartCoroutine(AttackTurn(animator, enemyScript.enemyData.damage));
                                 }
@@ -424,7 +439,12 @@ public class GridManager : MonoBehaviour
     private IEnumerator AttackTurn(Animator animator, int enemyDamage){
         yield return new WaitForSeconds(2f);
         animator.SetTrigger("Punch");
+
+        GameObject skill = GameObject.FindGameObjectWithTag("Passive_2");
         int defense = playerData.armor.itemPoint;
+        if(skill != null){
+            defense += defense * 20 / 100;
+        }
         if(enemyDamage == 2){
             defenseScalingFactor = Random.Range(100, 201);
         }else if(enemyDamage >= 10){

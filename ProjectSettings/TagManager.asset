@@ -12,6 +12,12 @@ TagManager:
   - Sword
   - Passive_1
   - Passive_2
+  - Physical_1
+  - Skill2
+  - Skill1
+  - Skill3
+  - ActiveSkill
+  - Cooldown
   layers:
   - Default
   - TransparentFX
