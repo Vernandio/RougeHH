@@ -40,17 +40,17 @@ public class TurnManager : MonoBehaviour
             playerMovement = playerObject.GetComponent<MovementPlayer>();
         }
 
-        GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach (GameObject enemyObject in enemyObjects)
-        {
-            Enemy enemy = enemyObject.GetComponent<Enemy>();
-            if (enemy != null)
-            {
-                enemies.Add(enemy);
-            }
-        }
+        // GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
+        // foreach (GameObject enemyObject in enemyObjects)
+        // {
+        //     Enemy enemy = enemyObject.GetComponent<Enemy>();
+        //     if (enemy != null)
+        //     {
+        //         enemies.Add(enemy);
+        //     }
+        // }
 
-        InitializeTurnOrder();
+        // InitializeTurnOrder();
         StartPlayerTurn();
     }
 
@@ -65,10 +65,7 @@ public class TurnManager : MonoBehaviour
     public void AddEnemyToTurnOrder(Enemy newEnemy)
     {
         enemies.Add(newEnemy);
-        if (newEnemy.aggroState)
-        {
-            turnOrder.Add((Turn)System.Enum.GetValues(typeof(Turn)).Length);
-        }
+        InitializeTurnOrder();
     }
 
     private void InitializeTurnOrder()

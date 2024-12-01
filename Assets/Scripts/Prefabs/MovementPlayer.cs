@@ -14,6 +14,7 @@ public class MovementPlayer : MonoBehaviour
     public bool isMoving = false;
     private Animator _animator;
     public bool isPlayerTurn = false;
+    public bool isAttack = false;
 
     private void Awake()
     {
@@ -249,11 +250,19 @@ public class MovementPlayer : MonoBehaviour
     public void SetPlayerTurn()
     {
         isPlayerTurn = true;
+        GridManager.Instance.turn = true;
     }
 
     public IEnumerator EndPlayerTurn()
     {
-        yield return new WaitForSeconds(2.5f);
+        while (isMoving)  // Check the isMoving flag
+        {
+            yield return null;  // Keep waiting until the player finishes moving
+        }
+        if(isAttack){
+            isAttack = false;
+            yield return new WaitForSeconds(1.5f);
+        }
         isPlayerTurn = false;
         TurnManager.Instance.EndTurn();
     }

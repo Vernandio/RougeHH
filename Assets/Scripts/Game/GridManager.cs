@@ -65,7 +65,8 @@ public class GridManager : MonoBehaviour
 
     private float lastAttackTime = 0f;
     public float attackCooldown = 2f;
-    private int defenseScalingFactor;
+    public bool turn = false;
+
 
     void Awake()
     {
@@ -402,8 +403,9 @@ public class GridManager : MonoBehaviour
             if(!playerMovement.isPlayerTurn){
                 return;
             }
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit) && turn)
             {
+                turn = false;
                 if (hit.collider.CompareTag("Tile"))
                 {
                     if(playerMovement.isMoving){
@@ -427,6 +429,7 @@ public class GridManager : MonoBehaviour
                         
                         if (IsAdjacent(playerPosition, enemyPosition))
                         {
+                            playerMovement.isAttack = true;
                             string randomAttack = attackAnimations[Random.Range(0, attackAnimations.Length)];
                             _animator.SetTrigger(randomAttack);
                             Vector3 directionToFace = (enemyPosition - playerMovement.transform.position).normalized;

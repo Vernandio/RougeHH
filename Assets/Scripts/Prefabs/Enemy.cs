@@ -20,6 +20,8 @@ public class Enemy : MonoBehaviour
     private int defenseScalingFactor;
     public bool idleState = false;
     public bool aggroState = false;
+    private bool isMoving = false;
+    private bool isAttack = false;
 
     private static readonly List<string> enemyNames = new List<string>
     {
@@ -144,6 +146,7 @@ public class Enemy : MonoBehaviour
         message.text = "!!";
         message.gameObject.SetActive(true);
         StartCoroutine(resetMessage());
+        TurnManager.Instance.AddEnemyToTurnOrder(this);
     }
 
     private IEnumerator resetMessage()
@@ -183,14 +186,11 @@ public class Enemy : MonoBehaviour
         CameraShaker.Instance.ShakeOnce(3f, 3f, 0.5f, 0.5f);
     }
 
-
-
     //Turn Logic
     public IEnumerator EnemyTurn()
     {
         if (aggroState)
         {
-            // Attack if adjacent to the player
             if (IsAdjacent(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position))
             {
                 if(currentHP > 0){
@@ -199,13 +199,19 @@ public class Enemy : MonoBehaviour
             }else if(!IsAdjacent(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position)){
                 MoveTowardsPlayer();
             }
-            // Wait before ending the turn
-            yield return new WaitForSeconds(1f); // Adjust this delay based on your game flow
-            TurnManager.Instance.EndTurn();  // Assuming you have the TurnManager set up properly
+            while(isMoving){
+                yield return null;
+            }
+            if(isAttack){
+                isAttack = false;
+                yield return new WaitForSeconds(1.5f);
+            }
+            TurnManager.Instance.EndTurn();  
         }
     }
 
     public void AttackPlayer(){
+        isAttack = true;
         _animator.SetTrigger("Punch");
 
         GameObject skill = GameObject.FindGameObjectWithTag("Passive_2");
@@ -229,11 +235,9 @@ public class Enemy : MonoBehaviour
 
     bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
     {
-        // Rounding positions to integers to eliminate floating-point precision issues
         Vector3 playerRounded = new Vector3(Mathf.Round(playerPosition.x), 0, Mathf.Round(playerPosition.z));
         Vector3 enemyRounded = new Vector3(Mathf.Round(enemyPosition.x), 0, Mathf.Round(enemyPosition.z));
 
-        // Check if player and enemy are adjacent (left/right or forward/back)
         return (Mathf.Abs(playerRounded.x - enemyRounded.x) == 1 && playerRounded.z == enemyRounded.z) ||
             (Mathf.Abs(playerRounded.z - enemyRounded.z) == 1 && playerRounded.x == enemyRounded.x);
     }
@@ -259,6 +263,7 @@ public class Enemy : MonoBehaviour
 
     private IEnumerator MoveOneTileAtATime(List<Vector3> path)
     {
+        isMoving = true;
         Vector3 destination = new Vector3(path[0].x, transform.position.y, path[0].z);
 
         Vector3 direction = (destination - transform.position).normalized;
@@ -269,6 +274,7 @@ public class Enemy : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
             yield return null;
         }
+        isMoving = false;
 
         while (Quaternion.Angle(transform.rotation, targetRotation) > 1f) 
         {
