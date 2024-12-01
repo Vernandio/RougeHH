@@ -149,6 +149,10 @@ public class MovementPlayer : MonoBehaviour
         return false;
     }
 
+    public void enemyRemove(Enemy enemy){
+        enemies.Remove(enemy);
+    }
+
     private bool checkIsMoving(){
         return isMoving;
     }

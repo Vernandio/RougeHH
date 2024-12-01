@@ -162,6 +162,8 @@ public class Enemy : MonoBehaviour
     {
         TurnManager.Instance.RemoveEnemyFromTurnList(this);
         GridManager.Instance.RemoveEnemyFromGrid(this);
+        MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
+        playerMovement.enemyRemove(this);
 
         StartCoroutine(deathAnimation());
         Debug.Log($"{enemyData.enemyName} has been defeated.");
@@ -280,21 +282,19 @@ public class Enemy : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(direction);
 
         // Rotate the enemy towards the destination, with a threshold for smooth rotation
-        while (Quaternion.Angle(transform.rotation, targetRotation) > 1f)  // Tolerance for rotation
-        {
-            Debug.Log("MASUK KE MoveOneTileAtATime (ROTATION)");
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            yield return null;
-        }
 
         // Move the enemy towards the destination, with a small tolerance
         while (Vector3.Distance(transform.position, destination) > 0.1f)  // Tolerance for position
         {
-            Debug.Log("MASUK KE MoveOneTileAtATime (MOVEMENT)");
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
             yield return null;
         }
 
+        while (Quaternion.Angle(transform.rotation, targetRotation) > 1f)  // Tolerance for rotation
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            yield return null;
+        }
 
         // Snap to the exact destination position
         transform.position = destination;
