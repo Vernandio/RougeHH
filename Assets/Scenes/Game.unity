@@ -182,6 +182,7 @@ MonoBehaviour:
   bossEnemyData: {fileID: 11400000, guid: 6b585164b4c99cf46a909e3dd4785533, type: 2}
   normalStoneMaterial: {fileID: 963798294112862009, guid: 9ace386e16fe8234eaac46d5e345cd78, type: 3}
   attackCooldown: 2
+  turn: 0
 --- !u!4 &19076352
 Transform:
   m_ObjectHideFlags: 0
@@ -950,7 +951,7 @@ Transform:
   m_Children:
   - {fileID: 559812838}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &359238033
 GameObject:
@@ -2756,6 +2757,7 @@ GameObject:
   - component: {fileID: 981349955}
   - component: {fileID: 981349957}
   - component: {fileID: 981349956}
+  - component: {fileID: 981349958}
   m_Layer: 5
   m_Name: MessageMenu
   m_TagString: Untagged
@@ -2824,6 +2826,32 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 981349954}
   m_CullTransparentMesh: 1
+--- !u!61 &981349958
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981349954}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1200, y: 600}
+  m_EdgeRadius: 0
 --- !u!1 &983862603
 GameObject:
   m_ObjectHideFlags: 0
@@ -3053,7 +3081,7 @@ RectTransform:
   - {fileID: 1212512059}
   - {fileID: 981349955}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

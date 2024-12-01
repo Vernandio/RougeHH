@@ -131,10 +131,19 @@ public class GameManager : MonoBehaviour
             gameOverText.text = "Floor Cleared";
             gameOverMenu.SetActive(true);
         }else if(currentHealth <= 0){
-            Animator animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
-            gameOverText.text = "Game Over";
-            gameOverMenu.SetActive(true);
+            StartCoroutine(PlayDeathAnimation());
         }
+    }
+
+    private IEnumerator PlayDeathAnimation()
+    {
+        Animator animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
+        animator.SetTrigger("Death"); 
+
+        yield return new WaitForSeconds(2f);
+
+        gameOverText.text = "Game Over";
+        gameOverMenu.SetActive(true);
     }
 
     public void playerStats(){

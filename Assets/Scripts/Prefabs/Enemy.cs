@@ -21,7 +21,6 @@ public class Enemy : MonoBehaviour
     public bool idleState = false;
     public bool aggroState = false;
     private bool isMoving = false;
-    private bool isAttack = false;
 
     private static readonly List<string> enemyNames = new List<string>
     {
@@ -40,6 +39,9 @@ public class Enemy : MonoBehaviour
         enemyHPBar.value = 1;
         enemyHPBar.interactable = false;
         InitializeEnemy();
+    }
+
+    private void Update() {
     }
 
     void InitializeEnemy()
@@ -186,6 +188,10 @@ public class Enemy : MonoBehaviour
         CameraShaker.Instance.ShakeOnce(3f, 3f, 0.5f, 0.5f);
     }
 
+    public void FootstepSFX(){
+        soundManager.walkSound();
+    }
+
     //Turn Logic
     public IEnumerator EnemyTurn()
     {
@@ -199,19 +205,12 @@ public class Enemy : MonoBehaviour
             }else if(!IsAdjacent(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position)){
                 MoveTowardsPlayer();
             }
-            while(isMoving){
-                yield return null;
-            }
-            if(isAttack){
-                isAttack = false;
-                yield return new WaitForSeconds(1.5f);
-            }
+            yield return new WaitForSeconds(1f);
             TurnManager.Instance.EndTurn();  
         }
     }
 
     public void AttackPlayer(){
-        isAttack = true;
         _animator.SetTrigger("Punch");
 
         GameObject skill = GameObject.FindGameObjectWithTag("Passive_2");
@@ -263,6 +262,7 @@ public class Enemy : MonoBehaviour
 
     private IEnumerator MoveOneTileAtATime(List<Vector3> path)
     {
+        _animator.SetTrigger("WalkEnemy");
         isMoving = true;
         Vector3 destination = new Vector3(path[0].x, transform.position.y, path[0].z);
 
@@ -274,7 +274,6 @@ public class Enemy : MonoBehaviour
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
             yield return null;
         }
-        isMoving = false;
 
         while (Quaternion.Angle(transform.rotation, targetRotation) > 1f) 
         {
@@ -283,6 +282,7 @@ public class Enemy : MonoBehaviour
         }
 
         transform.position = destination;
+        isMoving = false;
     }
 
     //A* Logic

@@ -277,6 +277,10 @@ public class MovementPlayer : MonoBehaviour
         soundManager.swordSound();
         CameraShaker.Instance.ShakeOnce(3f, 3f, 0.5f, 0.5f);
     }
+    
+    public void DeathSFX(){
+        soundManager.deathSound();
+    }
 
     private bool checkIsMoving(){
         return isMoving;

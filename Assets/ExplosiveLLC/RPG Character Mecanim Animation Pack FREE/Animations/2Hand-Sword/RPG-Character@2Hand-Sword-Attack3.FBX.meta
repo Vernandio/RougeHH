@@ -753,8 +753,8 @@ ModelImporter:
       name: 2Hand-Sword-Attack3
       takeName: Take 001
       internalID: 7400000
-      firstFrame: 0
-      lastFrame: 36
+      firstFrame: 7
+      lastFrame: 28
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
