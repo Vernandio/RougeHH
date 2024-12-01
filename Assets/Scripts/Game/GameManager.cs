@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour
     int currentHealth;
     int maxExp;
 
-    // Start is called before the first frame update
     void Start()
     {
         currentHealth = playerData.healPotion.itemPoint;
@@ -31,7 +30,32 @@ public class GameManager : MonoBehaviour
         playerStats();
     }
 
-    private void TogglePassive(string passiveName)
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape)){
+            bool isActive = escapeMenu.activeSelf;
+            escapeMenu.SetActive(!isActive); 
+        }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3){
+            TogglePassive("Passive_1");
+        }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4){
+            TogglePassive("Physical_1");
+        }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5){
+            TogglePassive("Passive_2");
+        }
+
+        if (escapeMenu.activeSelf)
+        {
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
+        playerStats();
+        checkOver();
+    }
+
+     private void TogglePassive(string passiveName)
     {
         GameObject parent = GameObject.FindGameObjectWithTag("Player");
         if(passiveName == "Physical_1"){
@@ -57,7 +81,7 @@ public class GameManager : MonoBehaviour
                 GameObject active = FindChildWithTag(holder.transform, "Skill3");
                 active.SetActive(true);
             }
-            StartCoroutine(DeactivatePassiveAfterTime(passive, 10f, passiveName)); // Start the 10-second timer
+            StartCoroutine(DeactivatePassiveAfterTime(passive, 10f, passiveName));
         }
     }
 
@@ -82,45 +106,16 @@ public class GameManager : MonoBehaviour
         {
             if (child.CompareTag(tag))
             {
-                return child.gameObject; // Return the GameObject if found
+                return child.gameObject;
             }
 
-            // Recursively search in this child's children
             GameObject found = FindChildWithTag(child, tag);
             if (found != null)
             {
                 return found;
             }
         }
-
-        // Return null if not found
         return null;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape)){
-            bool isActive = escapeMenu.activeSelf;
-            escapeMenu.SetActive(!isActive); // Toggle active state
-        }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3){
-            TogglePassive("Passive_1");
-        }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4){
-            TogglePassive("Physical_1");
-        }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5){
-            TogglePassive("Passive_2");
-        }
-
-        if (escapeMenu.activeSelf)
-        {
-            Time.timeScale = 0;
-        }
-        else
-        {
-            Time.timeScale = 1;
-        }
-        playerStats();
-        checkOver();
     }
 
     public void PlayerTakeDamage(int damage){
@@ -137,7 +132,6 @@ public class GameManager : MonoBehaviour
             gameOverMenu.SetActive(true);
         }else if(currentHealth <= 0){
             Animator animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
-            // animator.SetTrigger("Death");
             gameOverText.text = "Game Over";
             gameOverMenu.SetActive(true);
         }
@@ -160,9 +154,9 @@ public class GameManager : MonoBehaviour
         if(playerData.selectedFloor == -30){
             currentFloor.text = "BOSS";
         }else{
-            currentFloor.text = "Floor " + playerData.selectedFloor; //Belum ada logicnya
+            currentFloor.text = "Floor " + playerData.selectedFloor; 
         }
-        enemyCount.text = "Enemy left: 0"; //Belum ada logicnya
+        enemyCount.text = "Enemy left: 0";
         playerLevel.text = "Level " + playerData.playerLevel.ToString();
         playerHP.text = currentHealth + "/" + playerData.healPotion.itemPoint.ToString();
         playerExp.text = playerData.playerExp.ToString() + "/" + maxExp.ToString();

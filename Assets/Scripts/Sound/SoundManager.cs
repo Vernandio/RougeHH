@@ -6,8 +6,6 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
     public AudioSource audioSource; 
-    public AudioClip normalMusic; 
-    public AudioClip combatMusic; 
     public AudioClip sword;
     public AudioClip death;
     public AudioClip walk;
@@ -24,28 +22,6 @@ public class SoundManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
-    public void combatSound(){
-        audioSource.Stop();
-        audioSource.clip = combatMusic;
-        audioSource.Play();
-    }
-
-    public void normalSound(){
-        audioSource.Stop();
-        audioSource.clip = normalMusic;
-        audioSource.Play();
     }
 
     public void swordSound(){

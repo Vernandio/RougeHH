@@ -67,7 +67,6 @@ public class Skills : MonoBehaviour
         }
     }
 
-    // Method to handle mouse exit event for hover effect
     public void OnMouseExit()
     {
         hover.SetActive(false);

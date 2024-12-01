@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-
     public enum Turn { Player, Enemy }
     public Turn currentTurn = Turn.Player;
 
@@ -48,19 +47,25 @@ public class GridManager : MonoBehaviour
     public PlayerDataSO playerData;
 
     [SerializeField]
-    private EnemyDataSO lowEnemyData; // Assign in Inspector
+    private EnemyDataSO lowEnemyData;
     [SerializeField]
-    private EnemyDataSO mediumEnemyData; // Assign in Inspector
+    private EnemyDataSO mediumEnemyData;
     [SerializeField]
-    private EnemyDataSO highEnemyData; // Assign in Inspector
+    private EnemyDataSO highEnemyData;
     [SerializeField]
-    private EnemyDataSO bossEnemyData; // Assign in Inspector
+    private EnemyDataSO bossEnemyData;
 
     [Header("Materials")]
-    public Material normalStoneMaterial; // Public variable for normal stone material
+    public Material normalStoneMaterial;
     private GameObject[] decorationPrefabs;
-    private Dictionary<Renderer, Material> originalTileMaterials = new Dictionary<Renderer, Material>(); // Store original materials
+    private Dictionary<Renderer, Material> originalTileMaterials = new Dictionary<Renderer, Material>();
     private Animator _animator;
+    private bool combatMusic = false;
+    private List<GameObject> instantiatedTiles = new List<GameObject>();
+
+    private float lastAttackTime = 0f;
+    public float attackCooldown = 2f;
+    private int defenseScalingFactor;
 
     void Awake()
     {
@@ -103,12 +108,10 @@ public class GridManager : MonoBehaviour
             Enemy enemy = enemyObject.GetComponent<Enemy>();
             if (enemy != null)
             {
-                enemies.Add(enemy);  // Add each enemy to the list
+                enemies.Add(enemy);
             }
         }
     }
-
-    private bool combatMusic = false;
 
     void Update()
     {
@@ -117,13 +120,13 @@ public class GridManager : MonoBehaviour
         CheckEnemyPlayerProximity();
         if(combatMusic){
             audioSource.clip = combatClip;
-            if (!audioSource.isPlaying)  // Only play if not already playing
+            if (!audioSource.isPlaying) 
             {
                 audioSource.Play();
             }
         }else{
             audioSource.clip = normalClip;
-            if (!audioSource.isPlaying)  // Only play if not already playing
+            if (!audioSource.isPlaying)
             {
                 audioSource.Play();
             }
@@ -141,26 +144,6 @@ public class GridManager : MonoBehaviour
                 break;
             }
         }
-    }
-
-    public bool IsValidTile(Vector3 position)
-    {
-        foreach (Vector3 validPosition in validTilePositions)
-        {
-            if (Vector3.Distance(validPosition, position) < 0.1f)
-            {
-                Collider[] colliders = Physics.OverlapSphere(validPosition, 0.1f);
-                foreach (Collider collider in colliders)
-                {
-                    if (collider.CompareTag("Decoration"))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     void GenerateRooms()
@@ -306,25 +289,19 @@ public class GridManager : MonoBehaviour
         return null;
     }
 
-    private List<GameObject> instantiatedTiles = new List<GameObject>();
-
     void CreateHallway(Vector3 start, Vector3 end)
     {
         Vector3 current = start;
 
-        // Horizontal creation
         while (Mathf.RoundToInt(current.x) != Mathf.RoundToInt(end.x))
         {
             Vector3 hallwayPosition = new Vector3(current.x, -0.0015f, current.z);
 
-            // Remove existing tile if present
             RemoveExistingTile(hallwayPosition);
 
-            // Instantiate new tile
             GameObject newTile = Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
             instantiatedTiles.Add(newTile);
 
-            // Add to valid tile positions if it's not already present
             if (!validTilePositions.Contains(hallwayPosition))
             {
                 validTilePositions.Add(hallwayPosition);
@@ -333,19 +310,15 @@ public class GridManager : MonoBehaviour
             current.x += current.x < end.x ? 1 : -1;
         }
 
-        // Vertical creation
         while (Mathf.RoundToInt(current.z) != Mathf.RoundToInt(end.z))
         {
             Vector3 hallwayPosition = new Vector3(current.x, -0.0020f, current.z);
 
-            // Remove existing tile if present
             RemoveExistingTile(hallwayPosition);
 
-            // Instantiate new tile
             GameObject newTile = Instantiate(hallwayPrefab, hallwayPosition, Quaternion.identity, transform);
             instantiatedTiles.Add(newTile);
 
-            // Add to valid tile positions if it's not already present
             if (!validTilePositions.Contains(hallwayPosition))
             {
                 validTilePositions.Add(hallwayPosition);
@@ -357,36 +330,31 @@ public class GridManager : MonoBehaviour
 
     void RemoveExistingTile(Vector3 position)
     {
-        // Assuming the tile is a GameObject that is at the given position, you can find it and delete it
-        Collider[] hitColliders = Physics.OverlapSphere(position, 0.1f); // Adjust the radius as needed
+        Collider[] hitColliders = Physics.OverlapSphere(position, 0.1f);
         foreach (var hitCollider in hitColliders)
         {
-            if (hitCollider.CompareTag("Decoration"))  // Replace "Tile" with the actual tag of the tiles
+            if (hitCollider.CompareTag("Decoration")) 
             {
-                Destroy(hitCollider.gameObject);  // Destroy the tile GameObject
-                break;  // Exit once we find the tile at the position
+                Destroy(hitCollider.gameObject);
+                break; 
             }
         }
     }
 
-    bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
+    public bool IsValidTile(Vector3 position)
     {
-        // Rounding positions to integers to eliminate floating-point precision issues
-        Vector3 playerRounded = new Vector3(Mathf.Round(playerPosition.x), 0, Mathf.Round(playerPosition.z));
-        Vector3 enemyRounded = new Vector3(Mathf.Round(enemyPosition.x), 0, Mathf.Round(enemyPosition.z));
-
-        // Check if player and enemy are adjacent (left/right or forward/back)
-        return (Mathf.Abs(playerRounded.x - enemyRounded.x) == 1 && playerRounded.z == enemyRounded.z) ||
-            (Mathf.Abs(playerRounded.z - enemyRounded.z) == 1 && playerRounded.x == enemyRounded.x);
-    }
-
-    bool CheckEnemyStates()
-    {
-        foreach (Enemy enemy in enemies)
+        foreach (Vector3 validPosition in validTilePositions)
         {
-            if (enemy.idleState || enemy.aggroState)
+            if (Vector3.Distance(validPosition, position) < 0.1f)
             {
-                // Log if the enemy is in idleState or aggroState
+                Collider[] colliders = Physics.OverlapSphere(validPosition, 0.1f);
+                foreach (Collider collider in colliders)
+                {
+                    if (collider.CompareTag("Decoration"))
+                    {
+                        return false;
+                    }
+                }
                 return true;
             }
         }
@@ -396,9 +364,6 @@ public class GridManager : MonoBehaviour
     public void RemoveEnemyFromGrid(Enemy enemy){
         enemies.Remove(enemy);
     }
-
-    private float lastAttackTime = 0f;
-    public float attackCooldown = 2f;
     void HandleInput()
     {
 
@@ -435,7 +400,6 @@ public class GridManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             if(!playerMovement.isPlayerTurn){
-                Debug.Log("ITS NOT PLAYER TURN!!!");
                 return;
             }
             if (Physics.Raycast(ray, out hit))
@@ -450,22 +414,19 @@ public class GridManager : MonoBehaviour
                     if (playerMovement != null && IsValidTile(targetPosition))
                     {
                         playerMovement.MoveTo(targetPosition, CheckEnemyStates());
-                        ClearHighlightedPath(); // Clear highlights after clicking
+                        ClearHighlightedPath(); 
                     }
                 }
                 else if (hit.collider.CompareTag("Enemy"))
                 {
                     if (Time.time - lastAttackTime >= attackCooldown){
-                        Debug.Log("Enemy Hit");
                         _animator = GameObject.FindGameObjectWithTag("Player").GetComponent<Animator>();
                         GameObject enemy = hit.collider.gameObject;
                         Vector3 enemyPosition = enemy.transform.position;
                         Vector3 playerPosition = playerMovement.transform.position;
-
-                        // Check if the enemy is adjacent to the player
+                        
                         if (IsAdjacent(playerPosition, enemyPosition))
                         {
-                            Debug.Log("Adjacent Hit");
                             string randomAttack = attackAnimations[Random.Range(0, attackAnimations.Length)];
                             _animator.SetTrigger(randomAttack);
                             Vector3 directionToFace = (enemyPosition - playerMovement.transform.position).normalized;
@@ -474,8 +435,7 @@ public class GridManager : MonoBehaviour
 
                             lastAttackTime = Time.time;
 
-                            playerMovement.transform.rotation = lookRotation; // Adjust speed as needed
-                            Debug.Log("Player Data Sword: " + playerData.sword.itemPoint);
+                            playerMovement.transform.rotation = lookRotation;
                             Enemy enemyScript = enemy.GetComponent<Enemy>();
                             if (enemyScript != null)
                             {
@@ -496,52 +456,37 @@ public class GridManager : MonoBehaviour
 
                                 enemyScript.TakeDamage(damage);
                                 StartCoroutine(playerMovement.EndPlayerTurn());
-                                // Animator animator = enemy.GetComponent<Animator>();
-                                // if(enemyScript.currentHP > 0){
-                                //     StartCoroutine(AttackTurn(animator, enemyScript.enemyData.damage));
-                                // }
-                                Debug.Log("Enemy HITS: " + playerData.sword.itemPoint);
-                            }
-                            else
-                            {
-                                Debug.LogWarning("Enemy script not found!");
                             }
                         }
                     }
                 }
                 else
                 {
-                    ClearHighlightedPath(); // Clear highlights if not on a tile
+                    ClearHighlightedPath(); 
                 }
             }
         }
     }
 
-    private int defenseScalingFactor;
-    private IEnumerator AttackTurn(Animator animator, int enemyDamage){
-        yield return new WaitForSeconds(2f);
-        animator.SetTrigger("Punch");
+    bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
+    {
+        Vector3 playerRounded = new Vector3(Mathf.Round(playerPosition.x), 0, Mathf.Round(playerPosition.z));
+        Vector3 enemyRounded = new Vector3(Mathf.Round(enemyPosition.x), 0, Mathf.Round(enemyPosition.z));
 
-        GameObject skill = GameObject.FindGameObjectWithTag("Passive_2");
-        int defense = playerData.armor.itemPoint;
-        if(skill != null){
-            defense += defense * 20 / 100;
+        return (Mathf.Abs(playerRounded.x - enemyRounded.x) == 1 && playerRounded.z == enemyRounded.z) ||
+            (Mathf.Abs(playerRounded.z - enemyRounded.z) == 1 && playerRounded.x == enemyRounded.x);
+    }
+
+    bool CheckEnemyStates()
+    {
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.idleState || enemy.aggroState)
+            {
+                return true;
+            }
         }
-        if(enemyDamage == 2){
-            defenseScalingFactor = Random.Range(100, 201);
-        }else if(enemyDamage >= 10){
-            defenseScalingFactor = Random.Range(50, 101);
-        }else if(enemyDamage >= 50){
-            defenseScalingFactor = Random.Range(20, 51);
-        }
-
-        float defenseFactor = 1 - (defense / (defense + defenseScalingFactor));
-        Debug.Log("Defense Factor: " + defenseFactor);
-        float damageOutput = enemyDamage * defenseFactor;
-
-        Debug.Log("Damage Output: " + damageOutput);
-
-        gameManager.PlayerTakeDamage((int)damageOutput);  // Call PlayerTakeDamage() to apply the damage to the player
+        return false;
     }
 
     public void attackPlayer(int damage){
@@ -550,7 +495,7 @@ public class GridManager : MonoBehaviour
 
     void HighlightPath(List<Vector3> path)
     {
-        ClearHighlightedPath(); // Clear previous highlights
+        ClearHighlightedPath(); 
 
         foreach (Vector3 position in path)
         {
@@ -560,16 +505,14 @@ public class GridManager : MonoBehaviour
                 Renderer renderer = collider.GetComponent<Renderer>();
                 if (renderer != null)
                 {
-                    // Only store the original material if not already stored
                     if (!originalTileMaterials.ContainsKey(renderer))
                     {
-                        originalTileMaterials[renderer] = renderer.material; // Store original material
+                        originalTileMaterials[renderer] = renderer.material; 
                     }
 
-                    // Highlight the tile by changing its material color
-                    Material highlightMaterial = new Material(renderer.material);  // Create a unique instance for each tile
-                    highlightMaterial.color = Color.white; // Apply white color for highlight
-                    renderer.material = highlightMaterial; // Set the new material for the tile
+                    Material highlightMaterial = new Material(renderer.material); 
+                    highlightMaterial.color = Color.white; 
+                    renderer.material = highlightMaterial; 
 
                     highlightedPathRenderers.Add(renderer);
                 }
@@ -581,15 +524,14 @@ public class GridManager : MonoBehaviour
     {
         foreach (Renderer renderer in highlightedPathRenderers)
         {
-            // If the original material is stored, restore it
             if (originalTileMaterials.ContainsKey(renderer))
             {
-                renderer.material = originalTileMaterials[renderer];  // Restore original material
+                renderer.material = originalTileMaterials[renderer];  
             }
         }
 
-        highlightedPathRenderers.Clear();  // Clear list of highlighted tiles
-        originalTileMaterials.Clear();     // Clear the dictionary of original materials
+        highlightedPathRenderers.Clear();
+        originalTileMaterials.Clear();  
     }
 
     void SpawnPlayer()
@@ -612,10 +554,9 @@ public class GridManager : MonoBehaviour
             Debug.LogError("MovementPlayer component not found on player prefab.");
         }
 
-        // Assign the player to the camera
         if (CameraFollow.Instance != null)
         {
-            CameraFollow.Instance.setPlayer(player.transform); // Ensure this is properly assigned
+            CameraFollow.Instance.setPlayer(player.transform);
         }
         else
         {
@@ -627,10 +568,8 @@ public class GridManager : MonoBehaviour
     {
         int totalEnemies = Mathf.RoundToInt((playerData.selectedFloor * 0.2f) + 7);
 
-        // Get room-to-tile mapping
         Dictionary<Rect, List<Vector3>> roomTileMapping = GridManager.Instance.GetRoomTileMapping();
 
-        // Ensure rooms are valid
         if (roomTileMapping.Count == 0)
         {
             Debug.LogError("No valid rooms found for spawning enemies.");
@@ -638,13 +577,11 @@ public class GridManager : MonoBehaviour
         }
 
         List<Rect> rooms = new List<Rect>(roomTileMapping.Keys);
-        List<Vector3> occupiedTiles = new List<Vector3>(); // Tracks enemy positions and their buffer zones
+        List<Vector3> occupiedTiles = new List<Vector3>(); 
 
-        // Calculate initial even distribution
         int enemiesPerRoom = totalEnemies / rooms.Count;
         int remainingEnemies = totalEnemies % rooms.Count;
 
-        // Spawn enemies in each room
         foreach (Rect room in rooms)
         {
             List<Vector3> roomTiles = roomTileMapping[room];
@@ -657,8 +594,8 @@ public class GridManager : MonoBehaviour
                 {
                     Vector3 spawnPosition = validTiles[Random.Range(0, validTiles.Count)];
                     spawnPosition.y += 0.4f;
-                    occupiedTiles.Add(spawnPosition); // Add position to occupied list
-                    roomTiles.Remove(spawnPosition); // Remove from room's valid tiles
+                    occupiedTiles.Add(spawnPosition); 
+                    roomTiles.Remove(spawnPosition); 
 
                     string enemyType = GetRandomEnemyType(playerData.selectedFloor);
                     SpawnEnemyAtPosition(spawnPosition, enemyType);
@@ -666,7 +603,6 @@ public class GridManager : MonoBehaviour
             }
         }
 
-        // Distribute remaining enemies randomly among rooms
         while (remainingEnemies > 0)
         {
             Rect randomRoom = rooms[Random.Range(0, rooms.Count)];
@@ -677,8 +613,8 @@ public class GridManager : MonoBehaviour
             {
                 Vector3 spawnPosition = validTiles[Random.Range(0, validTiles.Count)];
                 spawnPosition.y += 0.4f;
-                occupiedTiles.Add(spawnPosition); // Add position to occupied list
-                roomTiles.Remove(spawnPosition); // Remove from room's valid tiles
+                occupiedTiles.Add(spawnPosition); 
+                roomTiles.Remove(spawnPosition);
 
                 string enemyType = GetRandomEnemyType(playerData.selectedFloor);
                 SpawnEnemyAtPosition(spawnPosition, enemyType);
@@ -689,22 +625,19 @@ public class GridManager : MonoBehaviour
 
     string GetRandomEnemyType(int floor)
     {
-        // Dynamic probabilities: Low, Medium, High
-        float lowChance = Mathf.Clamp01(1.0f - (floor * 0.05f)); // Decreases with floor level
-        float mediumChance = Mathf.Clamp01(0.3f + (floor * 0.03f)); // Increases with floor level
-        float highChance = Mathf.Clamp01(0.1f + (floor * 0.02f)); // Increases with floor level
+        float lowChance = Mathf.Clamp01(1.0f - (floor * 0.05f)); 
+        float mediumChance = Mathf.Clamp01(0.3f + (floor * 0.03f)); 
+        float highChance = Mathf.Clamp01(0.1f + (floor * 0.02f));
 
-        // Normalize probabilities to ensure they sum to 1
         float totalChance = lowChance + mediumChance + highChance;
         lowChance /= totalChance;
         mediumChance /= totalChance;
         highChance /= totalChance;
 
-        // Randomly determine enemy type based on adjusted chances
         float randomValue = Random.value;
-        if (randomValue < lowChance) return "Low"; // Low-tier enemy
-        else if (randomValue < lowChance + mediumChance) return "Medium"; // Medium-tier enemy
-        else return "High"; // High-tier enemy
+        if (randomValue < lowChance) return "Low";
+        else if (randomValue < lowChance + mediumChance) return "Medium"; 
+        else return "High";
     }
 
     void SpawnEnemyAtPosition(Vector3 position, string type)
@@ -761,26 +694,11 @@ public class GridManager : MonoBehaviour
                 Debug.LogError("Enemy script not found on the prefab!");
             }
         }
-        // TagTileAsEnemyTile(position);
-    }
-
-    void TagTileAsEnemyTile(Vector3 position)
-    {
-        // Assuming the tile is a GameObject that is at the given position, you can find it and set the tag
-        Collider[] hitColliders = Physics.OverlapSphere(position, 0.1f); // Adjust the radius as needed
-        foreach (var hitCollider in hitColliders)
-        {
-            if (hitCollider.CompareTag("Tile"))  // Replace "Tile" with the actual tag of the tiles
-            {
-                hitCollider.gameObject.tag = "Enemy_Tile";  // Assign the "EnemyTile" tag to the tile
-                break;  // Exit once we find the tile at the position
-            }
-        }
     }
 
     void CheckEnemyPlayerProximity()
     {
-        GameObject player = GameObject.FindGameObjectWithTag("Player"); // Ensure the player is tagged correctly
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
 
         if (player == null) return;
 
@@ -799,13 +717,12 @@ public class GridManager : MonoBehaviour
             {
                 if (enemyScript != null)
                 {
-                    enemyScript.alert(); // Assuming Alert() is the method in the Enemy script for the alert state
+                    enemyScript.alert(); 
                 }
             }
 
             if (distanceToPlayer <= 3f)
             {
-                // Rotate the enemy to face the player
                 enemyScript.aggro();
                 Vector3 directionToPlayer = (playerPosition - enemyPosition).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);

@@ -26,7 +26,6 @@ public class CameraFollow : MonoBehaviour
     {
         if (player == null)
         {
-            Debug.LogWarning("Player transform is not assigned to CameraFollow.");
             return;
         }
 
@@ -38,6 +37,5 @@ public class CameraFollow : MonoBehaviour
     public void setPlayer(Transform newPlayer)
     {
         player = newPlayer;
-        Debug.Log("Camera is now following: " + player.name);
     }
 }

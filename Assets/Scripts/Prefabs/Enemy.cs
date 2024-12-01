@@ -8,15 +8,26 @@ using EZCameraShake;
 public class Enemy : MonoBehaviour
 {
     public EnemyDataSO enemyData;
-    public int currentHP;
     public TextMeshPro nameText;
-    private Animator _animator;
     public Slider enemyHPBar;
     public PlayerDataSO playerData;
     public Text message;
+    public SoundManager soundManager;
+    private Animator _animator;
+    private int currentHP;
+    private float moveSpeed = 3f;   // Move speed for the enemy
+    private float rotationSpeed = 10f;  // Rotation speed to turn smoothly towards the player
+    private int defenseScalingFactor;
     public bool idleState = false;
     public bool aggroState = false;
-    public SoundManager soundManager;
+
+    private static readonly List<string> enemyNames = new List<string>
+    {
+        "AC", "AS", "BD", "BT", "CG", "CT", "CV", "DD", "DO", "FO", 
+        "FR", "FW", "GN", "GY", "HO", "JK", "KH", "MJ", "MM", "MR", 
+        "MV", "NB", "NE", "NS", "NT", "OV", "PL", "RU", "SC", "TI", 
+        "VD", "VM", "VX", "WS", "WW", "YD"
+    };
 
     private void Awake() {
         _animator = GetComponent<Animator>();
@@ -36,21 +47,8 @@ public class Enemy : MonoBehaviour
             nameText = GetComponentInChildren<TextMeshPro>();
             nameText.text = GetRandomEnemyName();
             currentHP = enemyData.maxHP;
-            Debug.Log($"{enemyData.enemyName} spawned with {currentHP} HP and {enemyData.damage} damage.");
-        }
-        else
-        {
-            Debug.LogError("EnemyData is not assigned!");
         }
     }
-
-    private static readonly List<string> enemyNames = new List<string>
-    {
-        "AC", "AS", "BD", "BT", "CG", "CT", "CV", "DD", "DO", "FO", 
-        "FR", "FW", "GN", "GY", "HO", "JK", "KH", "MJ", "MM", "MR", 
-        "MV", "NB", "NE", "NS", "NT", "OV", "PL", "RU", "SC", "TI", 
-        "VD", "VM", "VX", "WS", "WW", "YD"
-    };
 
     public static string GetRandomEnemyName()
     {
@@ -58,7 +56,6 @@ public class Enemy : MonoBehaviour
         return enemyNames[randomIndex];
     }
 
-    private int defenseScalingFactor;
     public void TakeDamage(int damage)
     {
         int defense = enemyData.defense;
@@ -94,7 +91,6 @@ public class Enemy : MonoBehaviour
         message.gameObject.SetActive(true);
 
         currentHP -= (int)realDamage;
-        Debug.Log($"{enemyData.enemyName} took {realDamage} damage. Remaining HP: {currentHP}");
 
         StartCoroutine(swordAnimation());
 
@@ -139,7 +135,6 @@ public class Enemy : MonoBehaviour
     }
 
     public void aggro(){
-        // soundManager.combatSound();
         if(aggroState){
             return;
         }
@@ -166,7 +161,6 @@ public class Enemy : MonoBehaviour
         playerMovement.enemyRemove(this);
 
         StartCoroutine(deathAnimation());
-        Debug.Log($"{enemyData.enemyName} has been defeated.");
         Destroy(gameObject, 2.5f);
     }
 
@@ -191,8 +185,7 @@ public class Enemy : MonoBehaviour
 
 
 
-
-    //CODING DISINI
+    //Turn Logic
     public IEnumerator EnemyTurn()
     {
         if (aggroState)
@@ -212,17 +205,6 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
-    {
-        // Rounding positions to integers to eliminate floating-point precision issues
-        Vector3 playerRounded = new Vector3(Mathf.Round(playerPosition.x), 0, Mathf.Round(playerPosition.z));
-        Vector3 enemyRounded = new Vector3(Mathf.Round(enemyPosition.x), 0, Mathf.Round(enemyPosition.z));
-
-        // Check if player and enemy are adjacent (left/right or forward/back)
-        return (Mathf.Abs(playerRounded.x - enemyRounded.x) == 1 && playerRounded.z == enemyRounded.z) ||
-            (Mathf.Abs(playerRounded.z - enemyRounded.z) == 1 && playerRounded.x == enemyRounded.x);
-    }
-
     public void AttackPlayer(){
         _animator.SetTrigger("Punch");
 
@@ -240,18 +222,25 @@ public class Enemy : MonoBehaviour
         }
 
         float defenseFactor = 1 - (defense / (defense + defenseScalingFactor));
-        Debug.Log("Defense Factor: " + defenseFactor);
         float damageOutput = enemyData.damage * defenseFactor;
 
         GridManager.Instance.attackPlayer((int)damageOutput);
     }
 
+    bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
+    {
+        // Rounding positions to integers to eliminate floating-point precision issues
+        Vector3 playerRounded = new Vector3(Mathf.Round(playerPosition.x), 0, Mathf.Round(playerPosition.z));
+        Vector3 enemyRounded = new Vector3(Mathf.Round(enemyPosition.x), 0, Mathf.Round(enemyPosition.z));
+
+        // Check if player and enemy are adjacent (left/right or forward/back)
+        return (Mathf.Abs(playerRounded.x - enemyRounded.x) == 1 && playerRounded.z == enemyRounded.z) ||
+            (Mathf.Abs(playerRounded.z - enemyRounded.z) == 1 && playerRounded.x == enemyRounded.x);
+    }
     
 
-    public float moveSpeed = 3f;   // Move speed for the enemy
-    public float rotationSpeed = 10f;  // Rotation speed to turn smoothly towards the player
+    //Movement Logic
 
-    // Call this function to start moving towards the player
     public void MoveTowardsPlayer()
     {
         if (aggroState)
@@ -262,10 +251,7 @@ public class Enemy : MonoBehaviour
                 List<Vector3> path = FindPath(transform.position, player.transform.position);
                 if (path != null && path.Count > 0)
                 {
-                    Debug.Log("PATH COUNT (NOT NULL) = " + path.Count);
                     StartCoroutine(MoveOneTileAtATime(path));  // Move enemy one tile at a time
-                }else{
-                    Debug.Log("PATH NOT EXIST (BLOCKED BY DECORATION)");
                 }
             }
         }
@@ -273,39 +259,32 @@ public class Enemy : MonoBehaviour
 
     private IEnumerator MoveOneTileAtATime(List<Vector3> path)
     {
-        Debug.Log("MASUK KE MoveOneTileAtATime");
-        // Only move to the first waypoint (one tile at a time)
         Vector3 destination = new Vector3(path[0].x, transform.position.y, path[0].z);
 
-        // Smoothly rotate towards the destination
         Vector3 direction = (destination - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(direction);
 
-        // Rotate the enemy towards the destination, with a threshold for smooth rotation
-
-        // Move the enemy towards the destination, with a small tolerance
-        while (Vector3.Distance(transform.position, destination) > 0.1f)  // Tolerance for position
+        while (Vector3.Distance(transform.position, destination) > 0.1f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
             yield return null;
         }
 
-        while (Quaternion.Angle(transform.rotation, targetRotation) > 1f)  // Tolerance for rotation
+        while (Quaternion.Angle(transform.rotation, targetRotation) > 1f) 
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             yield return null;
         }
 
-        // Snap to the exact destination position
         transform.position = destination;
     }
 
+    //A* Logic
     public List<Vector3> FindPath(Vector3 start, Vector3 target)
     {
         Vector3Int startTile = Vector3Int.RoundToInt(start);
         Vector3Int targetTile = Vector3Int.RoundToInt(target);
 
-        // Implement A* Pathfinding
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
 
@@ -333,10 +312,8 @@ public class Enemy : MonoBehaviour
 
             foreach (Vector3Int neighbor in GetNeighbors(currentNode.Position))
             {
-                // Skip if the neighbor is already in the closed list
                 if (closedList.Contains(new Node(neighbor, null, 0, 0))) continue;
 
-                // Check if the neighbor tile is valid (tagged with "Tile" or "Hallway")
                 if (!IsValidTile(neighbor)) continue;
 
                 float gCost = currentNode.GCost + 1;
@@ -350,24 +327,20 @@ public class Enemy : MonoBehaviour
             }
         }
 
-        return null;  // Return null if no path found
+        return null;
     }
 
-    // Helper function to check if the tile is valid (tagged with "Tile" or "Hallway")
     private bool IsValidTile(Vector3Int position)
     {
-        // Convert Vector3Int position to Vector3 for querying the tile's tag
-        Vector3 worldPosition = new Vector3(position.x, 0, position.z); // Assuming y-coordinate is not relevant
+        Vector3 worldPosition = new Vector3(position.x, 0, position.z);
         RaycastHit hit;
         
-        // Cast a ray to check if the tile at the given position has a valid tag
         if (Physics.Raycast(worldPosition + Vector3.up * 10, Vector3.down, out hit, Mathf.Infinity))
         {
-            // Check if the tile has the required tag ("Tile" or "Hallway")
             return hit.collider.CompareTag("Tile") || hit.collider.CompareTag("Hallway");
         }
 
-        return false;  // If no valid tile found, return false
+        return false;
     }
 
     private List<Vector3> RetracePath(Node startNode, Node endNode)
@@ -399,7 +372,7 @@ public class Enemy : MonoBehaviour
 
     private float GetHeuristic(Vector3Int start, Vector3Int target)
     {
-        return Mathf.Abs(start.x - target.x) + Mathf.Abs(start.z - target.z);  // Manhattan Distance
+        return Mathf.Abs(start.x - target.x) + Mathf.Abs(start.z - target.z);  
     }
 
     private class Node
