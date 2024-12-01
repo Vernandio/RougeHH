@@ -151,7 +151,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e2add6c36f891c45b9d3e232333dcec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentTurn: 0
   gameManager: {fileID: 1135927768}
+  audioSource: {fileID: 516788303}
+  combatClip: {fileID: 8300000, guid: a91d0bf6b26f62843858aaf80bb8ac53, type: 3}
+  normalClip: {fileID: 8300000, guid: 7f35116d28987c942ad6193104333c0e, type: 3}
   tilePrefab: {fileID: 7169154759562999851, guid: b592f6d9aa824e74c9fb10d9775799a6, type: 3}
   hallwayPrefab: {fileID: 7169154759562999851, guid: b592f6d9aa824e74c9fb10d9775799a6, type: 3}
   playerPrefab: {fileID: 231203030740466318, guid: 14d1865053ae5fd4595da45b7713bce9, type: 3}
@@ -162,6 +166,7 @@ MonoBehaviour:
   maxRoomSize: 10
   maxAttempts: 100
   bufferSize: 1
+  enemies: []
   stonePrefab: {fileID: 3184971331619326670, guid: 9795c67f86f143e4a9583a76c71dc4a5, type: 3}
   tablePrefab: {fileID: 6176166504291227298, guid: f19981c3ab8825542961a3bf6d7419c9, type: 3}
   barrelPrefab: {fileID: 4950432988827189083, guid: 896fcf3c627c21743b7312b3f68b317c, type: 3}
@@ -946,6 +951,53 @@ Transform:
   - {fileID: 559812838}
   m_Father: {fileID: 0}
   m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &359238033
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 359238035}
+  - component: {fileID: 359238034}
+  m_Layer: 0
+  m_Name: TurnManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &359238034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359238033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30a5461fed46d1a49b503210e64d3440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentTurn: 0
+  playerMovement: {fileID: 0}
+  enemies: []
+--- !u!4 &359238035
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 359238033}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 16.009052, y: 0.4648243, z: 25.962566}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &408321791
 PrefabInstance:
@@ -5278,9 +5330,9 @@ RectTransform:
   m_Father: {fileID: 235036191}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 34, y: 680}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 34, y: 592}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &7039394587753331732

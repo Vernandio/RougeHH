@@ -12,27 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f127c22abd0cd1408a5d958833eea20, type: 3}
   m_Name: PlayerDataSO
   m_EditorClassIdentifier: 
-  playerLevel: 1
-  playerExp: 0
+  playerLevel: 5
+  playerExp: 4000
   floorLevel: 100
-  selectedFloor: 0
-  currentZhen: 0
+  selectedFloor: 1
+  currentZhen: 12
   healPotion:
     itemLevel: 1
     itemPrice: 10
-    itemPoint: 20
+    itemPoint: 24
   sword:
     itemLevel: 1
     itemPrice: 10
-    itemPoint: 5
+    itemPoint: 8
   armor:
-    itemLevel: 1
+    itemLevel: 2
     itemPrice: 10
     itemPoint: 5
   defense:
     itemLevel: 1
     itemPrice: 10
-    itemPoint: 5
+    itemPoint: 7
   magic:
     itemLevel: 1
     itemPrice: 10

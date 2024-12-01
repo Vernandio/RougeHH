@@ -4,8 +4,15 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
+
+    public enum Turn { Player, Enemy }
+    public Turn currentTurn = Turn.Player;
+
     public static GridManager Instance { get; private set; }
     public GameManager gameManager;
+    public AudioSource audioSource;
+    public AudioClip combatClip;
+    public AudioClip normalClip;
 
     [Header("Prefabs")]
     public GameObject tilePrefab;
@@ -27,6 +34,7 @@ public class GridManager : MonoBehaviour
     private MovementPlayer playerMovement;
     private HashSet<(Rect, Rect)> connectedRoomPairs = new HashSet<(Rect, Rect)>();
     private List<Renderer> highlightedPathRenderers = new List<Renderer>();
+    public List<Enemy> enemies;
 
     [Header("Decoration Prefabs")]
     public GameObject stonePrefab;
@@ -66,7 +74,7 @@ public class GridManager : MonoBehaviour
         }
     }
 
-    void Start()
+    private IEnumerator Start()
     {
         decorationPrefabs = new GameObject[] { tablePrefab, barrelPrefab, pillarPrefab, fireplacePrefab };
         if(playerData.selectedFloor == -30){
@@ -78,18 +86,61 @@ public class GridManager : MonoBehaviour
             GenerateRooms();
             SpawnPlayer();
             SpawnEnemies();
-            return;
+        }else{
+            GenerateRooms();
+            ConnectRooms();
+            SpawnPlayer();
+            SpawnEnemies();
         }
-        GenerateRooms();
-        ConnectRooms();
-        SpawnPlayer();
-        SpawnEnemies();
+
+        yield return new WaitForSeconds(1f);
+
+        GameObject[] enemyObjects = GameObject.FindGameObjectsWithTag("Enemy");
+        enemies = new List<Enemy>();
+
+        foreach (GameObject enemyObject in enemyObjects)
+        {
+            Enemy enemy = enemyObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemies.Add(enemy);  // Add each enemy to the list
+            }
+        }
     }
+
+    private bool combatMusic = false;
 
     void Update()
     {
+        CheckEnemyAggro();
         HandleInput();
         CheckEnemyPlayerProximity();
+        if(combatMusic){
+            audioSource.clip = combatClip;
+            if (!audioSource.isPlaying)  // Only play if not already playing
+            {
+                audioSource.Play();
+            }
+        }else{
+            audioSource.clip = normalClip;
+            if (!audioSource.isPlaying)  // Only play if not already playing
+            {
+                audioSource.Play();
+            }
+        }
+    }
+
+    void CheckEnemyAggro()
+    {
+        combatMusic = false;
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.aggroState)
+            {
+                combatMusic = true;
+                break;
+            }
+        }
     }
 
     public bool IsValidTile(Vector3 position)
@@ -320,14 +371,37 @@ public class GridManager : MonoBehaviour
 
     bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
     {
-        return (Mathf.Abs(playerPosition.x - enemyPosition.x) == 1 && Mathf.Abs(playerPosition.z - enemyPosition.z) == 0) ||
-               (Mathf.Abs(playerPosition.x - enemyPosition.x) == 0 && Mathf.Abs(playerPosition.z - enemyPosition.z) == 1);
+        // Rounding positions to integers to eliminate floating-point precision issues
+        Vector3 playerRounded = new Vector3(Mathf.Round(playerPosition.x), 0, Mathf.Round(playerPosition.z));
+        Vector3 enemyRounded = new Vector3(Mathf.Round(enemyPosition.x), 0, Mathf.Round(enemyPosition.z));
+
+        // Check if player and enemy are adjacent (left/right or forward/back)
+        return (Mathf.Abs(playerRounded.x - enemyRounded.x) == 1 && playerRounded.z == enemyRounded.z) ||
+            (Mathf.Abs(playerRounded.z - enemyRounded.z) == 1 && playerRounded.x == enemyRounded.x);
+    }
+
+    bool CheckEnemyStates()
+    {
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy.idleState || enemy.aggroState)
+            {
+                // Log if the enemy is in idleState or aggroState
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void RemoveEnemyFromGrid(Enemy enemy){
+        enemies.Remove(enemy);
     }
 
     private float lastAttackTime = 0f;
     public float attackCooldown = 2f;
     void HandleInput()
     {
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -340,7 +414,6 @@ public class GridManager : MonoBehaviour
                 {
                     List<Vector3> path = playerMovement.findPath(targetPosition, targetPosition);
                     HighlightPath(path);
-                    return;
                 }
                 if (playerMovement != null && IsValidTile(targetPosition))
                 {
@@ -361,14 +434,22 @@ public class GridManager : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            if(!playerMovement.isPlayerTurn){
+                Debug.Log("ITS NOT PLAYER TURN!!!");
+                return;
+            }
             if (Physics.Raycast(ray, out hit))
             {
                 if (hit.collider.CompareTag("Tile"))
                 {
+                    if(playerMovement.isMoving){
+                        playerMovement.isMoving = false;
+                        return;
+                    }
                     Vector3 targetPosition = hit.collider.transform.position;
                     if (playerMovement != null && IsValidTile(targetPosition))
                     {
-                        playerMovement.MoveTo(targetPosition);
+                        playerMovement.MoveTo(targetPosition, CheckEnemyStates());
                         ClearHighlightedPath(); // Clear highlights after clicking
                     }
                 }
@@ -413,11 +494,12 @@ public class GridManager : MonoBehaviour
                                     damage += damage * 20 / 100;
                                 }
 
-                                Animator animator = enemy.GetComponent<Animator>();
                                 enemyScript.TakeDamage(damage);
-                                if(enemyScript.currentHP > 0){
-                                    StartCoroutine(AttackTurn(animator, enemyScript.enemyData.damage));
-                                }
+                                StartCoroutine(playerMovement.EndPlayerTurn());
+                                // Animator animator = enemy.GetComponent<Animator>();
+                                // if(enemyScript.currentHP > 0){
+                                //     StartCoroutine(AttackTurn(animator, enemyScript.enemyData.damage));
+                                // }
                                 Debug.Log("Enemy HITS: " + playerData.sword.itemPoint);
                             }
                             else
@@ -460,6 +542,10 @@ public class GridManager : MonoBehaviour
         Debug.Log("Damage Output: " + damageOutput);
 
         gameManager.PlayerTakeDamage((int)damageOutput);  // Call PlayerTakeDamage() to apply the damage to the player
+    }
+
+    public void attackPlayer(int damage){
+        gameManager.PlayerTakeDamage(damage);
     }
 
     void HighlightPath(List<Vector3> path)
@@ -675,7 +761,7 @@ public class GridManager : MonoBehaviour
                 Debug.LogError("Enemy script not found on the prefab!");
             }
         }
-        TagTileAsEnemyTile(position);
+        // TagTileAsEnemyTile(position);
     }
 
     void TagTileAsEnemyTile(Vector3 position)
@@ -709,7 +795,7 @@ public class GridManager : MonoBehaviour
 
             Enemy enemyScript = enemy.GetComponent<Enemy>();
 
-            if (distanceToPlayer <= 6f)
+            if (distanceToPlayer <= 5f)
             {
                 if (enemyScript != null)
                 {

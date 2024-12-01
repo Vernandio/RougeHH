@@ -1009,4 +1009,8 @@ MonoBehaviour:
   enemyHPBar: {fileID: 6732884757545180564}
   playerData: {fileID: 11400000, guid: bded88baff994cb4689beb09897c3013, type: 2}
   message: {fileID: 2081392555943173659}
+  idleState: 0
+  aggroState: 0
   soundManager: {fileID: 3915621112758830585}
+  moveSpeed: 3
+  rotationSpeed: 10
