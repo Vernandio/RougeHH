@@ -95,7 +95,7 @@ ModelImporter:
       - time: 0
         functionName: DeathSFX
         data: 
-        objectReferenceParameter: {fileID: 11500000, guid: f4f0a2b368b74d247bc3c184aab5f14f, type: 3}
+        objectReferenceParameter: {fileID: 11500000, guid: 0f7529e71125a634782fbddb25e8a66b, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
