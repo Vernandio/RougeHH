@@ -59,20 +59,25 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        CheckActive();
         if (Input.GetKeyDown(KeyCode.Escape)){
             bool isActive = escapeMenu.activeSelf;
             escapeMenu.SetActive(!isActive); 
-        }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3 && !holder_passive1.activeSelf){
-            TogglePassive("Passive_1");
-            cooldownPassive1 = 8;
-            holder_passive1.SetActive(true);
-        }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4 && !holder_active.activeSelf){
-            TogglePassive("Physical_1");
-        }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5 && !holder_passive2.activeSelf){
-            TogglePassive("Passive_2");
-            cooldownPassive2 = 12;
-            holder_passive2.SetActive(true);
+        }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3){
+            if(!holder_passive1.activeSelf){
+                cooldownPassive1 = 8;
+                TogglePassive("Passive_1");
+                holder_passive1.SetActive(true);
+            }
+        }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4){
+            if(!holder_active.activeSelf){
+                TogglePassive("Physical_1");
+            }
+        }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5){
+            if(!holder_passive2.activeSelf){
+                cooldownPassive2 = 12;
+                TogglePassive("Passive_2");
+                holder_passive2.SetActive(true);
+            }
         }
 
         if (escapeMenu.activeSelf)
@@ -119,41 +124,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator DeactivatePassiveAfterTime(GameObject passive, float time, string passiveName)
-    {
-        yield return new WaitForSeconds(time);
-        passive.SetActive(false);
-        if(passiveName == "Passive_1"){
-            GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
-            GameObject active = FindChildWithTag(holder.transform, "Skill1");
-            active.SetActive(false);
-        }else if(passiveName == "Passive_2"){
-            GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
-            GameObject active = FindChildWithTag(holder.transform, "Skill3");
-            active.SetActive(false);
-        }
-    }
 
     public void CheckActive(){
-        if(activePassive1 <= 0){
+        if(activePassive1 == 0){
             GameObject parent = GameObject.FindGameObjectWithTag("Player");
             GameObject passive = FindChildWithTag(parent.transform, "Passive_1");
             passive.SetActive(false);
             GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
             GameObject active = FindChildWithTag(holder.transform, "Skill1");
             active.SetActive(false);
-        }else if(activePassive2 <= 0){
+        }else if(activePassive2 == 0){
             GameObject parent = GameObject.FindGameObjectWithTag("Player");
             GameObject passive = FindChildWithTag(parent.transform, "Passive_2");
             passive.SetActive(false);
             GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
             GameObject active = FindChildWithTag(holder.transform, "Skill3");
             active.SetActive(false);
-        }else if(cooldownPassive1 <= 0){
+        }else if(cooldownPassive1 == 0){
             holder_passive1.SetActive(false);
-        }else if(cooldownPassive2 <= 0){
+        }else if(cooldownPassive2 == 0){
             holder_passive2.SetActive(false);
-        }else if(cooldownActive <= 0){
+        }else if(cooldownActive == 0){
             holder_active.SetActive(false);
         }
 
@@ -176,6 +167,7 @@ public class GameManager : MonoBehaviour
         cooldownPassive1 -= 1;
         cooldownPassive2 -= 1;
         cooldownActive -= 1;
+        CheckActive();
     }
 
     private GameObject FindChildWithTag(Transform parent, string tag)
