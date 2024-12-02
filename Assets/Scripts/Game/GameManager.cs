@@ -30,11 +30,11 @@ public class GameManager : MonoBehaviour
     public Text cooldown_active;
     int currentHealth;
     int maxExp;
-    public int activePassive1;
-    public int activePassive2;
-    public int cooldownPassive1;
-    public int cooldownPassive2;
-    public int cooldownActive;
+    public int activePassive1 = 100;
+    public int activePassive2 = 100;
+    public int cooldownPassive1 = 100;
+    public int cooldownPassive2 = 100;
+    public int cooldownActive = 100;
 
     void Awake()
     {
@@ -229,7 +229,7 @@ public class GameManager : MonoBehaviour
         if(playerData.playerExp >= playerData.playerLevel * 1000){
             playerData.playerExp -= playerData.playerLevel * 1000;
             playerData.playerLevel += 1;
-            playerData.healPotion.itemPoint += playerData.playerLevel * 2;
+            playerData.healPotion.itemPoint += playerData.playerLevel * 20;
             playerData.sword.itemPoint += (int)(playerData.playerLevel * 1.5);
             playerData.defense.itemPoint += (int)(playerData.playerLevel * 1.2);
             MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();

@@ -720,18 +720,7 @@ public class GridManager : MonoBehaviour
 
             if (distanceToPlayer <= 5f)
             {
-                if (enemyScript != null)
-                {
-                    enemyScript.alert(); 
-                }
-            }
-
-            if (distanceToPlayer <= 3f)
-            {
-                enemyScript.aggro();
-                Vector3 directionToPlayer = (playerPosition - enemyPosition).normalized;
-                Quaternion lookRotation = Quaternion.LookRotation(directionToPlayer);
-                enemy.transform.rotation = Quaternion.Slerp(enemy.transform.rotation, lookRotation, Time.deltaTime * 5f); // Smooth rotation
+                enemyScript.alert(); 
             }
         }
     }

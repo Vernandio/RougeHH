@@ -21,6 +21,8 @@ public class Enemy : MonoBehaviour
     public bool idleState = false;
     public bool aggroState = false;
     private bool isMoving = false;
+    private float detectionRange = 5f;
+    private bool check = false;
 
     private static readonly List<string> enemyNames = new List<string>
     {
@@ -42,6 +44,12 @@ public class Enemy : MonoBehaviour
     }
 
     private void Update() {
+        if(check == false){
+            if(idleState && CheckLineOfSight()){
+                check = true;
+                aggro();
+            }
+        }
     }
 
     void InitializeEnemy()
@@ -139,17 +147,47 @@ public class Enemy : MonoBehaviour
     }
 
     public void aggro(){
-        if(aggroState){
+        if(aggroState == true){
             return;
+        }else if(aggroState == false){
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            Vector3 rotationToPlayer = (player.transform.position - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(rotationToPlayer);
+            transform.rotation = lookRotation; 
+            idleState = true;
+            aggroState = true;
+            message.color = Color.red;
+            message.text = "!!";
+            message.gameObject.SetActive(true);
+            StartCoroutine(resetMessage());
+            TurnManager.Instance.AddEnemyToTurnOrder(this);
         }
-        idleState = true;
-        aggroState = true;
-        message.color = Color.red;
-        message.text = "!!";
-        message.gameObject.SetActive(true);
-        StartCoroutine(resetMessage());
-        TurnManager.Instance.AddEnemyToTurnOrder(this);
     }
+
+    private bool CheckLineOfSight()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        Vector3 directionToPlayer = player.transform.position - transform.position;
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+        if (distanceToPlayer <= detectionRange)
+        {
+            RaycastHit hit;
+                
+            if (Physics.Raycast(transform.position + Vector3.up, directionToPlayer.normalized, out hit, detectionRange))
+            {
+                if (hit.transform.CompareTag("Player"))
+                {
+                    return true; 
+                }else{
+                    Debug.Log("1: " + hit.transform.tag);
+                    Debug.Log("2: " + hit.transform.name);
+                }
+            }
+        }
+        return false;
+    }
+
 
     private IEnumerator resetMessage()
     {
@@ -192,7 +230,6 @@ public class Enemy : MonoBehaviour
         soundManager.walkSound();
     }
 
-    //Turn Logic
     public IEnumerator EnemyTurn()
     {
         if (aggroState)
@@ -211,6 +248,10 @@ public class Enemy : MonoBehaviour
     }
 
     public void AttackPlayer(){
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        Vector3 rotationToPlayer = (player.transform.position - transform.position).normalized;
+        Quaternion lookRotation = Quaternion.LookRotation(rotationToPlayer);
+        transform.rotation = lookRotation; 
         _animator.SetTrigger("Punch");
 
         GameObject skill = GameObject.FindGameObjectWithTag("Passive_2");
@@ -242,8 +283,6 @@ public class Enemy : MonoBehaviour
     }
     
 
-    //Movement Logic
-
     public void MoveTowardsPlayer()
     {
         if (aggroState)
@@ -251,10 +290,13 @@ public class Enemy : MonoBehaviour
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null)
             {
+                Debug.Log("Move towards the player");
                 List<Vector3> path = FindPath(transform.position, player.transform.position);
                 if (path != null && path.Count > 0)
                 {
-                    StartCoroutine(MoveOneTileAtATime(path));  // Move enemy one tile at a time
+                    StartCoroutine(MoveOneTileAtATime(path)); 
+                }else{
+                    Debug.LogError("Path is null or empty.");
                 }
             }
         }
@@ -269,17 +311,17 @@ public class Enemy : MonoBehaviour
         Vector3 direction = (destination - transform.position).normalized;
         Quaternion targetRotation = Quaternion.LookRotation(direction);
 
+        while (Quaternion.Angle(transform.rotation, targetRotation) > 1f) 
+        {
+            transform.rotation = targetRotation;
+        }
+        
         while (Vector3.Distance(transform.position, destination) > 0.1f)
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, moveSpeed * Time.deltaTime);
             yield return null;
         }
 
-        while (Quaternion.Angle(transform.rotation, targetRotation) > 1f) 
-        {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-            yield return null;
-        }
 
         transform.position = destination;
         isMoving = false;
@@ -319,8 +361,7 @@ public class Enemy : MonoBehaviour
             foreach (Vector3Int neighbor in GetNeighbors(currentNode.Position))
             {
                 if (closedList.Contains(new Node(neighbor, null, 0, 0))) continue;
-
-                if (!IsValidTile(neighbor)) continue;
+                if (!GridManager.Instance.IsValidTile(neighbor)) continue;
 
                 float gCost = currentNode.GCost + 1;
                 float hCost = GetHeuristic(neighbor, targetTile);
@@ -334,19 +375,6 @@ public class Enemy : MonoBehaviour
         }
 
         return null;
-    }
-
-    private bool IsValidTile(Vector3Int position)
-    {
-        Vector3 worldPosition = new Vector3(position.x, 0, position.z);
-        RaycastHit hit;
-        
-        if (Physics.Raycast(worldPosition + Vector3.up * 10, Vector3.down, out hit, Mathf.Infinity))
-        {
-            return hit.collider.CompareTag("Tile") || hit.collider.CompareTag("Hallway");
-        }
-
-        return false;
     }
 
     private List<Vector3> RetracePath(Node startNode, Node endNode)
