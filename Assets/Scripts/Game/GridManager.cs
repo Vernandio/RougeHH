@@ -429,6 +429,7 @@ public class GridManager : MonoBehaviour
                         
                         if (IsAdjacent(playerPosition, enemyPosition))
                         {
+                            gameManager.action();
                             playerMovement.isAttack = true;
                             string randomAttack = attackAnimations[Random.Range(0, attackAnimations.Length)];
                             _animator.SetTrigger(randomAttack);
@@ -452,6 +453,7 @@ public class GridManager : MonoBehaviour
                                 if(skill2 != null){
                                     damage += damage * 150 / 100;
                                     skill2.SetActive(false);
+                                    gameManager.setActiveCooldown();
                                 }
                                 if(skill3 != null){
                                     damage += damage * 20 / 100;

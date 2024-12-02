@@ -20,27 +20,59 @@ public class GameManager : MonoBehaviour
     public GameObject escapeMenu;
     public GameObject gameOverMenu;
     public Text gameOverText;
+    public Text active_passive1;
+    public Text active_passive2;
+    public GameObject holder_passive1;
+    public GameObject holder_passive2;
+    public GameObject holder_active;
+    public Text cooldown_passive1;
+    public Text cooldown_passive2;
+    public Text cooldown_active;
     int currentHealth;
     int maxExp;
+    public int activePassive1;
+    public int activePassive2;
+    public int cooldownPassive1;
+    public int cooldownPassive2;
+    public int cooldownActive;
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
         currentHealth = playerData.healPotion.itemPoint;
         maxExp = playerData.playerLevel * 1000;
         playerStats();
+        active_passive1.fontSize = 20;
+        active_passive2.fontSize = 20;
     }
 
     void Update()
     {
+        checkActive();
         if (Input.GetKeyDown(KeyCode.Escape)){
             bool isActive = escapeMenu.activeSelf;
             escapeMenu.SetActive(!isActive); 
-        }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3){
+        }else if(Input.GetKeyDown(KeyCode.Alpha1) && playerData.playerLevel >= 3 && !holder_passive1.activeSelf){
             TogglePassive("Passive_1");
-        }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4){
+            cooldownPassive1 = 8;
+            holder_passive1.SetActive(true);
+        }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4 && !holder_active.activeSelf){
             TogglePassive("Physical_1");
-        }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5){
+        }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5 && !holder_passive2.activeSelf){
             TogglePassive("Passive_2");
+            cooldownPassive2 = 12;
+            holder_passive2.SetActive(true);
         }
 
         if (escapeMenu.activeSelf)
@@ -75,13 +107,15 @@ public class GameManager : MonoBehaviour
             }else if(passiveName == "Passive_1"){
                 GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
                 GameObject active = FindChildWithTag(holder.transform, "Skill1");
+                activePassive1 = 5;
                 active.SetActive(true);
             }else if(passiveName == "Passive_2"){
                 GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
                 GameObject active = FindChildWithTag(holder.transform, "Skill3");
+                activePassive2 = 4;
                 active.SetActive(true);
             }
-            StartCoroutine(DeactivatePassiveAfterTime(passive, 10f, passiveName));
+            // StartCoroutine(DeactivatePassiveAfterTime(passive, 10f, passiveName));
         }
     }
 
@@ -98,6 +132,50 @@ public class GameManager : MonoBehaviour
             GameObject active = FindChildWithTag(holder.transform, "Skill3");
             active.SetActive(false);
         }
+    }
+
+    public void checkActive(){
+        if(activePassive1 <= 0){
+            GameObject parent = GameObject.FindGameObjectWithTag("Player");
+            GameObject passive = FindChildWithTag(parent.transform, "Passive_1");
+            passive.SetActive(false);
+            GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
+            GameObject active = FindChildWithTag(holder.transform, "Skill1");
+            active.SetActive(false);
+        }else if(activePassive2 <= 0){
+            GameObject parent = GameObject.FindGameObjectWithTag("Player");
+            GameObject passive = FindChildWithTag(parent.transform, "Passive_2");
+            passive.SetActive(false);
+            GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
+            GameObject active = FindChildWithTag(holder.transform, "Skill3");
+            active.SetActive(false);
+        }else if(cooldownPassive1 <= 0){
+            holder_passive1.SetActive(false);
+        }else if(cooldownPassive2 <= 0){
+            holder_passive2.SetActive(false);
+        }else if(cooldownActive <= 0){
+            holder_active.SetActive(false);
+        }
+
+        active_passive1.text = activePassive1.ToString();
+        active_passive2.text = activePassive2.ToString();
+        cooldown_passive1.text = cooldownPassive1.ToString();
+        cooldown_passive2.text = cooldownPassive2.ToString();
+        cooldown_active.text = cooldownActive.ToString();
+    }
+
+    public void setActiveCooldown(){
+        cooldownActive = 2;
+        cooldown_active.text = cooldownActive.ToString();
+        holder_active.SetActive(true);
+    }
+
+    public void action(){
+        activePassive1 -= 1;
+        activePassive2 -= 1;
+        cooldownPassive1 -= 1;
+        cooldownPassive2 -= 1;
+        cooldownActive -= 1;
     }
 
     private GameObject FindChildWithTag(Transform parent, string tag)

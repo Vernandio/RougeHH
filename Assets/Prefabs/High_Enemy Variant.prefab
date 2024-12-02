@@ -833,8 +833,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 6207400400945045470}
-  normalMusic: {fileID: 8300000, guid: 7f35116d28987c942ad6193104333c0e, type: 3}
-  combatMusic: {fileID: 8300000, guid: a91d0bf6b26f62843858aaf80bb8ac53, type: 3}
   sword: {fileID: 8300000, guid: 15f201e0f0a16b1418250cf4a6f5b96b, type: 3}
   death: {fileID: 8300000, guid: 3930027b1249a4644883211dd8211ea7, type: 3}
   walk: {fileID: 8300000, guid: 3a01892fb3c1d4c45b0fc383e96795ea, type: 3}
@@ -860,15 +858,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1438546959266459337, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1438546959266459337, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1438546959266459337, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1438546959266459337, guid: 60770bdb4dc667c45bea53db0339dc05, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1004,13 +1002,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyData: {fileID: 11400000, guid: 913e3826cdd77e3408fecbb1cc167545, type: 2}
-  currentHP: 0
   nameText: {fileID: 6299607401442380330}
   enemyHPBar: {fileID: 6732884757545180564}
   playerData: {fileID: 11400000, guid: bded88baff994cb4689beb09897c3013, type: 2}
   message: {fileID: 2081392555943173659}
+  soundManager: {fileID: 3915621112758830585}
   idleState: 0
   aggroState: 0
-  soundManager: {fileID: 3915621112758830585}
-  moveSpeed: 3
-  rotationSpeed: 10

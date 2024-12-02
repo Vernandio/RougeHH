@@ -70,6 +70,7 @@ public class MovementPlayer : MonoBehaviour
 
     public IEnumerator MoveOneTileAtATime(List<Vector3> path)
     {
+        GameManager.Instance.action();
         isMoving = true; 
 
         Vector3 destination = new Vector3(path[1].x, transform.position.y, path[1].z);
@@ -107,6 +108,7 @@ public class MovementPlayer : MonoBehaviour
             {
                 break;
             }
+            GameManager.Instance.action();
 
             Vector3 destination = new Vector3(waypoint.x, transform.position.y, waypoint.z);
 
