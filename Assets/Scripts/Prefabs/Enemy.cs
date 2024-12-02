@@ -171,20 +171,28 @@ public class Enemy : MonoBehaviour
         if (distanceToPlayer <= detectionRange)
         {
             RaycastHit hit;
-                
-            if (Physics.Raycast(transform.position + Vector3.up, directionToPlayer.normalized, out hit, detectionRange))
+
+            // Draw the ray in the Scene view for debugging
+            Debug.DrawRay(transform.position + Vector3.up * 1f, directionToPlayer.normalized * detectionRange, Color.red, 1f);  // Draw in red initially
+            
+            if (Physics.Raycast(transform.position + Vector3.up * 1f, directionToPlayer.normalized, out hit, detectionRange))
             {
+                // If the ray hits the player, make the ray green
                 if (hit.transform.CompareTag("Player"))
                 {
-                    return true; 
-                }else{
-                    Debug.Log("1: " + hit.transform.tag);
-                    Debug.Log("2: " + hit.transform.name);
+                    Debug.DrawRay(transform.position + Vector3.up * 1f, directionToPlayer.normalized * detectionRange, Color.green, 1f);  // Draw in green
+                    return true;
+                }
+                else
+                {
+                    Debug.DrawRay(transform.position + Vector3.up * 1f, directionToPlayer.normalized * detectionRange, Color.red, 1f);  // Draw in red if it hits an obstacle
+                    Debug.Log("Ray hit: " + hit.transform.name);  // Debug the object it hit
                 }
             }
         }
         return false;
     }
+
 
 
     private IEnumerator ResetMessage()
