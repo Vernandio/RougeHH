@@ -29,21 +29,19 @@ public class PlayerDataSO : ScriptableObject
     public EventChannelSO_Int OnZhenUpdated;
     public EventChannelSO_Item OnItemUpdated;
     public EventChannelSO_Int OnFloorUpdated;
-    // Method to Update Player's Experience and Raise Event
+    
     public void UpdatePlayerExp(int amount)
     {
         playerExp += amount;
-        OnPlayerExpUpdated.RaiseEvent(playerExp);  // Notify listeners of the update
+        OnPlayerExpUpdated.RaiseEvent(playerExp); 
     }
 
-    // Method to Update Zhen and Raise Event
     public void UpdateZhen(int amount)
     {
         currentZhen += amount;
-        OnZhenUpdated.RaiseEvent(currentZhen);  // Notify listeners of the update
+        OnZhenUpdated.RaiseEvent(currentZhen);
     }
 
-    // Method to Update an Item and Raise Event
     public void UpdateItem(ref Item item, int newLevel, int newPrice, int newPoint)
     {
         item.itemLevel = newLevel;
@@ -60,7 +58,7 @@ public class PlayerDataSO : ScriptableObject
             }
         }
 
-        OnItemUpdated.RaiseEvent(item);  // Notify listeners that an item has been updated
+        OnItemUpdated.RaiseEvent(item);
     }
 
     public void UpdateFloor(int floor){
