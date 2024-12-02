@@ -20,16 +20,16 @@ public class MenuManager : MonoBehaviour
         continueButton.interactable = saveLoadSystem.SaveFileExists();
 
         //Main Button
-        continueButton.onClick.AddListener(continueGame);
-        newGameButton.onClick.AddListener(newGame);
-        exitButton.onClick.AddListener(exitGame);
+        continueButton.onClick.AddListener(ContinueGame);
+        newGameButton.onClick.AddListener(NewGame);
+        exitButton.onClick.AddListener(ExitGame);
 
         //Validation New Game
-        backButton.onClick.AddListener(backToMainMenu);
-        continueButtonValidation.onClick.AddListener(continueGameValidation);
+        backButton.onClick.AddListener(BackToMainMenu);
+        continueButtonValidation.onClick.AddListener(ContinueGameValidation);
     }
 
-    private void continueGame()
+    private void ContinueGame()
     {
         if (saveLoadSystem.SaveFileExists())
         {
@@ -38,7 +38,7 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    private void newGame()
+    private void NewGame()
     {
         if(saveLoadSystem.SaveFileExists()){
             validationPanel.SetActive(true);
@@ -47,11 +47,11 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    private void backToMainMenu(){
+    private void BackToMainMenu(){
         validationPanel.SetActive(false);
     }
 
-    private void continueGameValidation(){
+    private void ContinueGameValidation(){
         newFile();
     }
 
@@ -82,7 +82,7 @@ public class MenuManager : MonoBehaviour
             SceneManager.LoadScene("Upgrade Menu");
     }
 
-    private void exitGame(){
+    private void ExitGame(){
         Application.Quit();
     }
 }

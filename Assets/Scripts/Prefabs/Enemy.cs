@@ -16,13 +16,11 @@ public class Enemy : MonoBehaviour
     private Animator _animator;
     private int currentHP;
     private float moveSpeed = 3f;   // Move speed for the enemy
-    private float rotationSpeed = 10f;  // Rotation speed to turn smoothly towards the player
     private int defenseScalingFactor;
     public bool idleState = false;
     public bool aggroState = false;
-    private bool isMoving = false;
     private float detectionRange = 5f;
-    private bool check = false;
+    public bool check = false;
 
     private static readonly List<string> enemyNames = new List<string>
     {
@@ -47,7 +45,7 @@ public class Enemy : MonoBehaviour
         if(check == false){
             if(idleState && CheckLineOfSight()){
                 check = true;
-                aggro();
+                Aggro();
             }
         }
     }
@@ -104,23 +102,23 @@ public class Enemy : MonoBehaviour
 
         currentHP -= (int)realDamage;
 
-        StartCoroutine(swordAnimation());
+        StartCoroutine(SwordAnimation());
 
-        StartCoroutine(resetMessage());
+        StartCoroutine(ResetMessage());
 
         if (currentHP <= 0)
         {
-            StartCoroutine(swordAnimation2());
+            StartCoroutine(SwordAnimation2());
             return;
         }
     }
 
-    private IEnumerator swordAnimation(){
+    private IEnumerator SwordAnimation(){
         yield return new WaitForSeconds(1f);
-        updateHPBar();
+        UpdateHPBar();
     }
 
-    private IEnumerator swordAnimation2(){
+    private IEnumerator SwordAnimation2(){
         yield return new WaitForSeconds(1.5f);
         if(enemyData.maxHP == 10){
             playerData.playerExp += 1000;
@@ -135,7 +133,7 @@ public class Enemy : MonoBehaviour
         Die();
     }
 
-    public void alert(){
+    public void Alert(){
         if(idleState){
             return;
         }
@@ -143,10 +141,10 @@ public class Enemy : MonoBehaviour
         message.color = Color.white;
         message.text = "??";
         message.gameObject.SetActive(true);
-        StartCoroutine(resetMessage());
+        StartCoroutine(ResetMessage());
     }
 
-    public void aggro(){
+    public void Aggro(){
         if(aggroState == true){
             return;
         }else if(aggroState == false){
@@ -159,7 +157,7 @@ public class Enemy : MonoBehaviour
             message.color = Color.red;
             message.text = "!!";
             message.gameObject.SetActive(true);
-            StartCoroutine(resetMessage());
+            StartCoroutine(ResetMessage());
             TurnManager.Instance.AddEnemyToTurnOrder(this);
         }
     }
@@ -189,7 +187,7 @@ public class Enemy : MonoBehaviour
     }
 
 
-    private IEnumerator resetMessage()
+    private IEnumerator ResetMessage()
     {
         yield return new WaitForSeconds(1f);
 
@@ -201,18 +199,18 @@ public class Enemy : MonoBehaviour
         TurnManager.Instance.RemoveEnemyFromTurnList(this);
         GridManager.Instance.RemoveEnemyFromGrid(this);
         MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
-        playerMovement.enemyRemove(this);
+        playerMovement.EnemyRemove(this);
 
-        StartCoroutine(deathAnimation());
+        StartCoroutine(DeathAnimation());
         Destroy(gameObject, 2.5f);
     }
 
-    private IEnumerator deathAnimation(){
+    private IEnumerator DeathAnimation(){
         yield return new WaitForSeconds(1f);
         _animator.SetTrigger("Death");
     }
 
-    private void updateHPBar()
+    private void UpdateHPBar()
     {
         enemyHPBar.value = (float)currentHP/(float)enemyData.maxHP;
     }
@@ -270,7 +268,7 @@ public class Enemy : MonoBehaviour
         float defenseFactor = 1 - (defense / (defense + defenseScalingFactor));
         float damageOutput = enemyData.damage * defenseFactor;
 
-        GridManager.Instance.attackPlayer((int)damageOutput);
+        GridManager.Instance.AttackPlayer((int)damageOutput);
     }
 
     bool IsAdjacent(Vector3 playerPosition, Vector3 enemyPosition)
@@ -305,7 +303,6 @@ public class Enemy : MonoBehaviour
     private IEnumerator MoveOneTileAtATime(List<Vector3> path)
     {
         _animator.SetTrigger("WalkEnemy");
-        isMoving = true;
         Vector3 destination = new Vector3(path[0].x, transform.position.y, path[0].z);
 
         Vector3 direction = (destination - transform.position).normalized;
@@ -324,7 +321,6 @@ public class Enemy : MonoBehaviour
 
 
         transform.position = destination;
-        isMoving = false;
     }
 
     //A* Logic

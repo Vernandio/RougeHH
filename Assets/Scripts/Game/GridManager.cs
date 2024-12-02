@@ -356,6 +356,7 @@ public class GridManager : MonoBehaviour
                         return false;
                     }
                 }
+
                 return true;
             }
         }
@@ -429,7 +430,7 @@ public class GridManager : MonoBehaviour
                         
                         if (IsAdjacent(playerPosition, enemyPosition))
                         {
-                            gameManager.action();
+                            gameManager.Action();
                             playerMovement.isAttack = true;
                             string randomAttack = attackAnimations[Random.Range(0, attackAnimations.Length)];
                             _animator.SetTrigger(randomAttack);
@@ -448,12 +449,12 @@ public class GridManager : MonoBehaviour
                                 GameObject skill3 = GameObject.FindGameObjectWithTag("Passive_2");
                                 int damage = playerData.sword.itemPoint;
                                 if(skill1 != null){
-                                    gameManager.lifeSteal(damage * 20 / 100);
+                                    gameManager.LifeSteal(damage * 20 / 100);
                                 }
                                 if(skill2 != null){
                                     damage += damage * 150 / 100;
                                     skill2.SetActive(false);
-                                    gameManager.setActiveCooldown();
+                                    gameManager.SetActiveCooldown();
                                 }
                                 if(skill3 != null){
                                     damage += damage * 20 / 100;
@@ -494,7 +495,7 @@ public class GridManager : MonoBehaviour
         return false;
     }
 
-    public void attackPlayer(int damage){
+    public void AttackPlayer(int damage){
         gameManager.PlayerTakeDamage(damage);
     }
 
@@ -561,7 +562,7 @@ public class GridManager : MonoBehaviour
 
         if (CameraFollow.Instance != null)
         {
-            CameraFollow.Instance.setPlayer(player.transform);
+            CameraFollow.Instance.SetPlayer(player.transform);
         }
         else
         {
@@ -720,7 +721,7 @@ public class GridManager : MonoBehaviour
 
             if (distanceToPlayer <= 5f)
             {
-                enemyScript.alert(); 
+                enemyScript.Alert(); 
             }
         }
     }

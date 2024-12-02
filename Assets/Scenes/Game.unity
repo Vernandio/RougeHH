@@ -2306,7 +2306,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: backToUpgradeMenu
+      value: BackToUpgradeMenu
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -3567,7 +3567,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: resume
+      value: Resume
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -3977,6 +3977,7 @@ MonoBehaviour:
   activePassive2: 0
   cooldownPassive1: 0
   cooldownPassive2: 0
+  cooldownActive: 100
 --- !u!1 &1212512058
 GameObject:
   m_ObjectHideFlags: 0
@@ -4319,7 +4320,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: backToMainMenu
+      value: BackToMainMenu
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -5718,7 +5719,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: backToUpgradeMenu
+      value: BackToUpgradeMenu
       objectReference: {fileID: 0}
     - target: {fileID: 3389301089942369751, guid: 35ed2132bcb106f428a232e9694da008, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName

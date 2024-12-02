@@ -39,7 +39,7 @@ public class MovementPlayer : MonoBehaviour
 
     void Update()
     {
-        checkIsMoving();
+        CheckIsMoving();
         if (isMoving)
         {
             _animator.SetBool("IsMoving", true);
@@ -63,14 +63,14 @@ public class MovementPlayer : MonoBehaviour
             if(aggro){
                 StartCoroutine(MoveOneTileAtATime(path));
             }else{
-                StartCoroutine(moveAlongPath(path));
+                StartCoroutine(MoveAlongPath(path));
             }
         }
     }
 
     public IEnumerator MoveOneTileAtATime(List<Vector3> path)
     {
-        GameManager.Instance.action();
+        GameManager.Instance.Action();
         isMoving = true; 
 
         Vector3 destination = new Vector3(path[1].x, transform.position.y, path[1].z);
@@ -98,17 +98,17 @@ public class MovementPlayer : MonoBehaviour
         StartCoroutine(EndPlayerTurn());
     }
 
-    private IEnumerator moveAlongPath(List<Vector3> path)
+    private IEnumerator MoveAlongPath(List<Vector3> path)
     {
         isMoving = true;
 
         foreach (Vector3 waypoint in path)
         {
-            if (IsAnyEnemyAlerted() || !checkIsMoving())  
+            if (IsAnyEnemyAlerted() || !CheckIsMoving())  
             {
                 break;
             }
-            GameManager.Instance.action();
+            GameManager.Instance.Action();
 
             Vector3 destination = new Vector3(waypoint.x, transform.position.y, waypoint.z);
 
@@ -142,7 +142,7 @@ public class MovementPlayer : MonoBehaviour
         List<Node> openList = new List<Node>();
         HashSet<Node> closedList = new HashSet<Node>();
 
-        Node startNode = new Node(startTile, null, 0, getHeuristic(startTile, targetTile));
+        Node startNode = new Node(startTile, null, 0, GetHeuristic(startTile, targetTile));
         openList.Add(startNode);
 
         while (openList.Count > 0)
@@ -161,10 +161,10 @@ public class MovementPlayer : MonoBehaviour
 
             if (currentNode.Position == targetTile)
             {
-                return reconstructPath(currentNode);
+                return ReconstructPath(currentNode);
             }
 
-            foreach (Vector3Int neighborPos in getNeighbors(currentNode.Position))
+            foreach (Vector3Int neighborPos in GetNeighbors(currentNode.Position))
             {
                 if (!GridManager.Instance.IsValidTile(neighborPos)) continue;
 
@@ -175,7 +175,7 @@ public class MovementPlayer : MonoBehaviour
                 Node neighborNode = openList.Find(n => n.Position == neighborPos);
                 if (neighborNode == null)
                 {
-                    neighborNode = new Node(neighborPos, currentNode, tentativeG, getHeuristic(neighborPos, targetTile));
+                    neighborNode = new Node(neighborPos, currentNode, tentativeG, GetHeuristic(neighborPos, targetTile));
                     openList.Add(neighborNode);
                 }
                 else if (tentativeG < neighborNode.G)
@@ -188,7 +188,7 @@ public class MovementPlayer : MonoBehaviour
         return null;
     }
 
-    private List<Vector3> reconstructPath(Node node)
+    private List<Vector3> ReconstructPath(Node node)
     {
         List<Vector3> path = new List<Vector3>();
         while (node != null)
@@ -200,7 +200,7 @@ public class MovementPlayer : MonoBehaviour
         return path;
     }
 
-    private List<Vector3Int> getNeighbors(Vector3Int position)
+    private List<Vector3Int> GetNeighbors(Vector3Int position)
     {
         List<Vector3Int> neighbors = new List<Vector3Int>
         {
@@ -212,7 +212,7 @@ public class MovementPlayer : MonoBehaviour
         return neighbors;
     }
 
-    private int getHeuristic(Vector3Int a, Vector3Int b)
+    private int GetHeuristic(Vector3Int a, Vector3Int b)
     {
         return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.z - b.z);
     }
@@ -284,7 +284,7 @@ public class MovementPlayer : MonoBehaviour
         soundManager.deathSound();
     }
 
-    private bool checkIsMoving(){
+    private bool CheckIsMoving(){
         return isMoving;
     }
 
@@ -300,18 +300,18 @@ public class MovementPlayer : MonoBehaviour
         return false;
     }
 
-    public void enemyRemove(Enemy enemy){
+    public void EnemyRemove(Enemy enemy){
         enemies.Remove(enemy);
     }
 
-    public void levelUp(){
+    public void LevelUp(){
         playerMessage.gameObject.SetActive(true);
         playerMessage.text = "Level Up!!";
         playerMessage.color = Color.yellow;
         StartCoroutine(resetMessage());
     }
 
-    public void getDamage(int damage){
+    public void GetDamage(int damage){
         playerMessage.gameObject.SetActive(true);
         playerMessage.text = damage.ToString();
         playerMessage.color = Color.red;

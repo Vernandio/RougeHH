@@ -34,7 +34,7 @@ public class CameraFollow : MonoBehaviour
         transform.position = smoothedPosition;
     }
 
-    public void setPlayer(Transform newPlayer)
+    public void SetPlayer(Transform newPlayer)
     {
         player = newPlayer;
     }

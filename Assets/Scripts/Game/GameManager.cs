@@ -52,14 +52,14 @@ public class GameManager : MonoBehaviour
     {
         currentHealth = playerData.healPotion.itemPoint;
         maxExp = playerData.playerLevel * 1000;
-        playerStats();
+        PlayerStats();
         active_passive1.fontSize = 20;
         active_passive2.fontSize = 20;
     }
 
     void Update()
     {
-        checkActive();
+        CheckActive();
         if (Input.GetKeyDown(KeyCode.Escape)){
             bool isActive = escapeMenu.activeSelf;
             escapeMenu.SetActive(!isActive); 
@@ -83,8 +83,8 @@ public class GameManager : MonoBehaviour
         {
             Time.timeScale = 1;
         }
-        playerStats();
-        checkOver();
+        PlayerStats();
+        CheckOver();
     }
 
      private void TogglePassive(string passiveName)
@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void checkActive(){
+    public void CheckActive(){
         if(activePassive1 <= 0){
             GameObject parent = GameObject.FindGameObjectWithTag("Player");
             GameObject passive = FindChildWithTag(parent.transform, "Passive_1");
@@ -164,13 +164,13 @@ public class GameManager : MonoBehaviour
         cooldown_active.text = cooldownActive.ToString();
     }
 
-    public void setActiveCooldown(){
+    public void SetActiveCooldown(){
         cooldownActive = 2;
         cooldown_active.text = cooldownActive.ToString();
         holder_active.SetActive(true);
     }
 
-    public void action(){
+    public void Action(){
         activePassive1 -= 1;
         activePassive2 -= 1;
         cooldownPassive1 -= 1;
@@ -199,11 +199,11 @@ public class GameManager : MonoBehaviour
     public void PlayerTakeDamage(int damage){
         currentHealth -= damage;
         MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
-        playerMovement.getDamage(damage);
-        playerStats();
+        playerMovement.GetDamage(damage);
+        PlayerStats();
     }
 
-    public void checkOver(){
+    public void CheckOver(){
         int enemyLeft = GameObject.FindGameObjectsWithTag("Enemy").Length;
         if(enemyLeft <= 0){
             gameOverText.text = "Floor Cleared";
@@ -224,7 +224,7 @@ public class GameManager : MonoBehaviour
         gameOverMenu.SetActive(true);
     }
 
-    public void playerStats(){
+    public void PlayerStats(){
 
         if(playerData.playerExp >= playerData.playerLevel * 1000){
             playerData.playerExp -= playerData.playerLevel * 1000;
@@ -233,7 +233,7 @@ public class GameManager : MonoBehaviour
             playerData.sword.itemPoint += (int)(playerData.playerLevel * 1.5);
             playerData.defense.itemPoint += (int)(playerData.playerLevel * 1.2);
             MovementPlayer playerMovement = GameObject.FindGameObjectWithTag("Player").GetComponent<MovementPlayer>();
-            playerMovement.levelUp();
+            playerMovement.LevelUp();
         }
 
         maxExp = playerData.playerLevel * 1000;
@@ -250,29 +250,32 @@ public class GameManager : MonoBehaviour
 
         playerHPBar.value = (float)currentHealth/(float)playerData.healPotion.itemPoint;
         playerExpBar.value = (float)playerData.playerExp/(float)maxExp;
-        updateEnemyCount();
+        UpdateEnemyCount();
     }
 
-    void updateEnemyCount()
+    void UpdateEnemyCount()
     {
         int enemyLeft = GameObject.FindGameObjectsWithTag("Enemy").Length;
         enemyCount.text = "Enemy left: " + enemyLeft;
     }
 
-    public void lifeSteal(int health){
+    public void LifeSteal(int health){
         currentHealth += health;
-        playerStats();
+        if(currentHealth > playerData.healPotion.itemPoint){
+            currentHealth = playerData.healPotion.itemPoint;
+        }
+        PlayerStats();
     }
 
-    public void resume(){
+    public void Resume(){
         escapeMenu.SetActive(false);
     }
 
-    public void backToUpgradeMenu(){
+    public void BackToUpgradeMenu(){
         SceneManager.LoadScene("Upgrade Menu");
     }
 
-    public void backToMainMenu(){
+    public void BackToMainMenu(){
         SceneManager.LoadScene("Main Menu");
     }
 }
