@@ -67,16 +67,19 @@ public class GameManager : MonoBehaviour
                 cooldownPassive1 = 8;
                 TogglePassive("Passive_1");
                 holder_passive1.SetActive(true);
+                CheckActive();
             }
         }else if(Input.GetKeyDown(KeyCode.Alpha2) && playerData.playerLevel >= 4){
             if(!holder_active.activeSelf){
                 TogglePassive("Physical_1");
+                CheckActive();
             }
         }else if(Input.GetKeyDown(KeyCode.Alpha3) && playerData.playerLevel >= 5){
             if(!holder_passive2.activeSelf){
                 cooldownPassive2 = 12;
                 TogglePassive("Passive_2");
                 holder_passive2.SetActive(true);
+                CheckActive();
             }
         }
 
@@ -110,14 +113,14 @@ public class GameManager : MonoBehaviour
             if(passiveName == "Physical_1"){
                 return;
             }else if(passiveName == "Passive_1"){
+                activePassive1 = 5;
                 GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
                 GameObject active = FindChildWithTag(holder.transform, "Skill1");
-                activePassive1 = 5;
                 active.SetActive(true);
             }else if(passiveName == "Passive_2"){
+                activePassive2 = 4;
                 GameObject holder = GameObject.FindGameObjectWithTag("ActiveSkill");
                 GameObject active = FindChildWithTag(holder.transform, "Skill3");
-                activePassive2 = 4;
                 active.SetActive(true);
             }
             // StartCoroutine(DeactivatePassiveAfterTime(passive, 10f, passiveName));
@@ -126,6 +129,7 @@ public class GameManager : MonoBehaviour
 
 
     public void CheckActive(){
+        Debug.Log("CooldownActive : " + cooldownActive);
         if(activePassive1 == 0){
             GameObject parent = GameObject.FindGameObjectWithTag("Player");
             GameObject passive = FindChildWithTag(parent.transform, "Passive_1");
@@ -159,6 +163,7 @@ public class GameManager : MonoBehaviour
         cooldownActive = 2;
         cooldown_active.text = cooldownActive.ToString();
         holder_active.SetActive(true);
+        CheckActive();
     }
 
     public void Action(){
